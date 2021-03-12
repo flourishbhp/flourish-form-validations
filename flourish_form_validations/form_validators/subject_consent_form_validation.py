@@ -3,6 +3,7 @@ from django import forms
 from django.apps import apps as django_apps
 from django.core.exceptions import ValidationError
 from edc_base.utils import relativedelta
+from edc_constants.constants import FEMALE, MALE
 from edc_form_validators import FormValidator
 
 
@@ -12,6 +13,8 @@ class SubjectConsentFormValidator(FormValidator):
 
     subject_consent_model = 'flourish_caregiver.subjectconsent'
 
+    maternal_dataset_model = 'flourish_caregiver.maternaldataset'
+
     @property
     def bhp_prior_screening_cls(self):
         return django_apps.get_model(self.prior_screening_model)
@@ -19,6 +22,10 @@ class SubjectConsentFormValidator(FormValidator):
     @property
     def subject_consent_cls(self):
         return django_apps.get_model(self.subject_consent_model)
+
+    @property
+    def maternal_dataset_cls(self):
+        return django_apps.get_model(self.maternal_dataset_model)
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -44,6 +51,7 @@ class SubjectConsentFormValidator(FormValidator):
         self.clean_initials_with_full_name()
 #         self.validate_dob(cleaned_data=self.cleaned_data,
 #                           model_obj=subject_screening)
+        self.validate_child_dob(cleaned_data=self.cleaned_data)
         self.validate_identity_number(cleaned_data=self.cleaned_data)
         self.validate_recruit_source()
         self.validate_recruitment_clinic()
@@ -142,10 +150,15 @@ class SubjectConsentFormValidator(FormValidator):
                        'Please correct.'}
                 self._errors.update(msg)
                 raise ValidationError(msg)
-            if cleaned_data.get('identity')[4] != '2':
+            gender = cleaned_data.get('gender')
+            if gender == FEMALE and cleaned_data.get('identity')[4] != '2':
                 msg = {'identity':
-                       'Identity provided indicates participant is Male. Please '
-                       'correct.'}
+                       'Participant gender is Female. Please correct identity number.'}
+                self._errors.update(msg)
+                raise ValidationError(msg)
+            elif gender == MALE and cleaned_data.get('identity')[4] != '1':
+                msg = {'identity':
+                       'Participant is Male. Please correct identity number.'}
                 self._errors.update(msg)
                 raise ValidationError(msg)
 
@@ -178,6 +191,23 @@ class SubjectConsentFormValidator(FormValidator):
                            f'from the DOB is {consent_age}.'}
                 self._errors.update(message)
                 raise ValidationError(message)
+
+    def validate_child_dob(self, cleaned_data=None):
+        child_dob = cleaned_data.get('child_dob')
+        screening_identifier = cleaned_data.get('screening_identifier')
+        if child_dob:
+            try:
+                maternal_dataset = self.maternal_dataset_cls.objects.get(
+                    screening_identifier=screening_identifier)
+            except self.maternal_dataset_cls.DoesNotExist:
+                pass
+            else:
+                if child_dob != maternal_dataset.delivdt:
+                    msg = {'child_dob':
+                           'Child date of birth does not match with dob '
+                           f'({maternal_dataset.delivdt}) from the dataset.'}
+                    self._errors.update(msg)
+                    raise ValidationError(msg)
 
     def validate_recruit_source(self):
         self.validate_other_specify(
