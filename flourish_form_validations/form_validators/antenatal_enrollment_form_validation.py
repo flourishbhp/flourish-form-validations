@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from edc_constants.constants import YES, POS, NEG, IND, NO, DWTA
+from edc_constants.constants import YES, POS, NEG, IND, NO, DWTA,NEVER,UNKNOWN,NOT_APPLICABLE
 from edc_form_validators import FormValidator
 from flourish_caregiver.helper_classes import EnrollmentHelper
 
@@ -44,7 +44,7 @@ class AntenatalEnrollmentFormValidator(CRFFormValidator,
         self.validate_against_consent_datetime(
             self.cleaned_data.get('report_datetime'),
             id=id)
-
+        self.validate_hiv_status_option()
         self.validate_current_hiv_status()
         self.validate_week32_date()
         self.validate_week32_result()
@@ -121,3 +121,24 @@ class AntenatalEnrollmentFormValidator(CRFFormValidator,
                        f'{report_datetime}'}
             self._errors.update(message)
             raise ValidationError(message)
+
+    def validate_hiv_status_option(self):
+
+        hiv_status_option = [NEG, IND, NEVER, UNKNOWN, DWTA]
+        for option in hiv_status_option:
+            if (self.cleaned_data.get('will_get_arvs') == (YES or NO)
+                    and self.cleaned_data.get('current_hiv_status')in [NEG, IND, NEVER, UNKNOWN, DWTA]):
+
+                message = {'will_get_arvs':
+                           'Participant is not HIV positive'}
+                self._errors.update(message)
+                raise ValidationError(message)
+            else:
+                if(self.cleaned_data.get('will_get_arvs') == NOT_APPLICABLE
+                  and self.cleaned_data.get('current_hiv_status') == POS):
+
+                    message = {'will_get_arvs':
+                               'Participant is HIV positive field applicable'}
+                    self._errors.update(message)
+                    raise ValidationError(message)
+
