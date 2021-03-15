@@ -18,8 +18,9 @@ class CaregiverClinicalMeasurementsFormValidator(CRFFormValidator,
                 cleaned_data.get('diastolic_bp')):
             if cleaned_data.get('systolic_bp') < \
                     cleaned_data.get('diastolic_bp'):
-                msg = {'diastolic_bp': 'Systolic blood pressure cannot be lower '
-                                    'than the diastolic blood pressure. '
-                                    'Please correct.'}
+                msg = {'diastolic_bp': 'Systolic blood pressure '
+                                       'cannot be lower '
+                                       'than the diastolic blood pressure. '
+                                       'Please correct.'}
                 self._errors.update(msg)
                 raise ValidationError(msg)

@@ -8,7 +8,6 @@ from .crf_form_validator import CRFFormValidator
 
 
 class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
-
     antenatal_enrollment_model = 'flourish_caregiver.antenatalenrollment'
 
     @property
@@ -38,8 +37,8 @@ class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
         subject_status = self.maternal_status_helper.hiv_status
 
         if subject_status == NEG and cleaned_data.get('chronic_since') == YES:
-            msg = {'chronic_since':
-                   'The caregiver is HIV negative. Chronic_since should be NO'}
+            msg = {'who_diagnosis':
+                       'The caregiver is HIV negative. Chronic_since should be NO'}
             self._errors.update(msg)
             raise ValidationError(msg)
 
@@ -52,9 +51,10 @@ class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
 
         if subject_status == POS and cleaned_data.get('chronic_since') == NO:
             if cleaned_data.get('who_diagnosis') != NO:
-                msg = {'chronic_since':
-                       'The caregiver is HIV positive, because Chronic_since is '
-                       'NO and Who Diagnosis should also be NO'}
+                msg = {'who_diagnosis':
+                           'The caregiver is HIV positive, because'
+                           ' Chronic_since is '
+                           'NO and Who Diagnosis should also be NO'}
                 self._errors.update(msg)
                 raise ValidationError(msg)
 
@@ -78,8 +78,9 @@ class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
                 selected = {obj.short_name: obj.name for obj in qs}
                 if NOT_APPLICABLE not in selected:
                     msg = {'who':
-                           'Participant indicated that they do not have WHO stage'
-                           ' III and IV, list of diagnosis must be N/A'}
+                           'Participant indicated that they do not have '
+                           'WHO stage III and IV, list of '
+                           'diagnosis must be N/A'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
 
@@ -87,11 +88,31 @@ class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
                 NOT_APPLICABLE,
                 m2m_field='who')
 
-    def validate_caregiver_chronic_multiple_selection(self):
-        selections = [NOT_APPLICABLE]
+    def validate_caregiver_chronic_multiple_selection(self, cleaned_data=None):
+
+        qs = self.cleaned_data.get('caregiver_chronic')
+        selected = {}
+        if qs and qs.count() > 0:
+            selected = {obj.short_name: obj.name for obj in qs}
+
+        if cleaned_data.get('chronic_since') == YES:
+            if NOT_APPLICABLE in selected:
+                msg = {'caregiver_chronic':
+                       'Participant indicated that they had chronic'
+                       ' conditions list of diagnosis cannot be N/A'}
+                self._errors.update(msg)
+                raise ValidationError(msg)
+
+        else:
+            if NOT_APPLICABLE not in selected:
+                msg = {'caregiver_chronic':
+                       'Participant indicated that they had no chronic'
+                       'conditions list of diagnosis should be N/A'}
+                self._errors.update(msg)
+                raise ValidationError(msg)
 
         self.m2m_single_selection_if(
-            *selections,
+            NOT_APPLICABLE,
             m2m_field='caregiver_chronic')
 
     def validate_other_caregiver(self):
@@ -117,5 +138,6 @@ class MedicalHistoryFormValidator(CRFFormValidator, FormValidator):
     @property
     def maternal_status_helper(self):
         cleaned_data = self.cleaned_data
-        status_helper = MaternalStatusHelper(cleaned_data.get('maternal_visit'))
+        status_helper = MaternalStatusHelper(
+            cleaned_data.get('maternal_visit'))
         return status_helper
