@@ -7,4 +7,4 @@ class TbKnowledgeFormValidator(FormValidatorMixin, FormValidator):
     def clean(self):
 
         self.m2m_other_specify(
-            field='tb_knowledge_medium')
+            m2m_field='tb_knowledge_medium')
