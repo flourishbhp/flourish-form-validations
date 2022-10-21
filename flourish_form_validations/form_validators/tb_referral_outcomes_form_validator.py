@@ -15,7 +15,7 @@ class TbReferralOutcomesFormValidator(FormValidatorMixin, FormValidator):
         self.m2m_required_if(
             YES,
             field='tb_diagnostic_perf',
-            field_required='tb_diagnostics')
+            m2m_field='tb_diagnostics')
 
         self.m2m_other_specify(
             OTHER,
