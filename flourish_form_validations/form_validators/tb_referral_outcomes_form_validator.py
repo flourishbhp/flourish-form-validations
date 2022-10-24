@@ -10,7 +10,8 @@ class TbReferralOutcomesFormValidator(FormValidatorMixin, FormValidator):
         self.required_if(
             NO,
             field='referral_clinic_appt',
-            field_required='further_tb_eval')
+            field_required='further_tb_eval',
+            inverse=False)
 
         self.m2m_required_if(
             YES,
