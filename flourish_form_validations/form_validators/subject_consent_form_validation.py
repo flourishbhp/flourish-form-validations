@@ -354,15 +354,8 @@ class SubjectConsentFormValidator(ConsentsFormValidatorMixin,
         Validates if the person being consented is an adult
         """
 
-        dob = self.cleaned_data.get('dob', None)
-        consent_datetime = self.cleaned_data.get('consent_datetime', None)
-
-        if not dob:
-            raise ValidationError({'dob': 'Please specify the date of birth'})
-
-        if not consent_datetime:
-            raise ValidationError(
-                {'consent_datetime': 'Please fill the consent date and time'})
+        dob = self.cleaned_data.get('dob')
+        consent_datetime = self.cleaned_data.get('consent_datetime')
 
         if dob and consent_datetime:
             age_in_years = age(dob, consent_datetime.date()).years

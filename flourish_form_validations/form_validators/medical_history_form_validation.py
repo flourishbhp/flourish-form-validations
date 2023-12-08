@@ -1,6 +1,6 @@
 from django.apps import apps as django_apps
 from django.core.exceptions import ValidationError
-from edc_constants.constants import NO, NOT_APPLICABLE, POS, YES, OTHER
+from edc_constants.constants import NO, NOT_APPLICABLE, POS, YES
 from edc_form_validators import FormValidator
 
 from flourish_caregiver.helper_classes import MaternalStatusHelper
@@ -23,19 +23,12 @@ class MedicalHistoryFormValidator(FormValidatorMixin, FormValidator):
             'maternal_visit').subject_identifier
         super().clean()
 
-        self.m2m_other_specify(OTHER, m2m_field='current_symptoms',
-                               field_other='current_symptoms_other')
+        self.validate_other_specify(field='current_symptoms')
 
         illness_fields = ['current_symptoms',
                           'symptoms_start_date', 'clinic_visit']
 
         for field in illness_fields:
-
-            if field == 'current_symptoms':
-                self.m2m_required_if(YES,
-                                     field='current_illness',
-                                     m2m_field=field)
-                continue
             self.required_if(
                 YES,
                 field_required=field,
