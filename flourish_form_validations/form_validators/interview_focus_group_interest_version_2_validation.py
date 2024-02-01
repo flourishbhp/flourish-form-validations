@@ -42,7 +42,7 @@ class InterviewFocusGroupInterestVersion2FormValidator(FormValidatorMixin, FormV
 
         eligible_responses = ['group', 'either', 'one_on_one']
 
-        self.required_if('group',
+        self.required_if('group', 'either',
                          field='discussion_pref',
                          field_required='hiv_group_pref')
 
