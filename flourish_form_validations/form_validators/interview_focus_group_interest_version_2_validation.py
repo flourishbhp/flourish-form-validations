@@ -41,7 +41,7 @@ class InterviewFocusGroupInterestVersion2FormValidator(FormValidatorMixin, FormV
 
         ]
 
-        eligible_responses = ['group', 'either']
+        eligible_responses = ['group', 'either', 'one_on_one']
 
         for field in required_fields:
 
