@@ -25,7 +25,6 @@ class InterviewFocusGroupInterestVersion2FormValidator(FormValidatorMixin, FormV
     def clean(self):
 
         required_fields = [
-            'hiv_group_pref',
             'infant_feeding',
             'school_performance',
             'adult_mental_health',
@@ -42,6 +41,10 @@ class InterviewFocusGroupInterestVersion2FormValidator(FormValidatorMixin, FormV
         ]
 
         eligible_responses = ['group', 'either', 'one_on_one']
+
+        self.required_if('group',
+                         field='discussion_pref',
+                         field_required='hiv_group_pref')
 
         for field in required_fields:
 
