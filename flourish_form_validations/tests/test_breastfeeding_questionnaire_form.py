@@ -24,7 +24,7 @@ class TestBreastFeedingQuestionnaireForm(TestModeMixin, TestCase):
         self.training_response2 = ReceivedTrainingOnFeedingList.objects.create(
             name='response2', short_name='response2')
         self.none_response = ReceivedTrainingOnFeedingList.objects.create(
-            short_name='none', name='none')
+            short_name='training_none', name='none')
 
         FlourishConsentVersion.objects.create(
             screening_identifier='ABC12345')
@@ -331,7 +331,7 @@ class TestBreastFeedingQuestionnaireForm(TestModeMixin, TestCase):
         # Create a mock cleaned data object with only 'none' as response
         cleaned_data = {'received_training':
                         ReceivedTrainingOnFeedingList.objects.filter(
-                            short_name='none')}
+                            short_name='training_none')}
 
         form_validator = BreastFeedingQuestionnaireFormValidator(
             cleaned_data=cleaned_data)
@@ -357,7 +357,7 @@ class TestBreastFeedingQuestionnaireForm(TestModeMixin, TestCase):
         # training_outcome
         cleaned_data = {'received_training':
                         ReceivedTrainingOnFeedingList.objects.filter(
-                            short_name='none'),
+                            short_name='training_none'),
                         'training_outcome': None}
 
         # Call the function and expect it not to raise a ValidationError
@@ -385,7 +385,7 @@ class TestBreastFeedingQuestionnaireForm(TestModeMixin, TestCase):
         # Create a mock cleaned data object with only 'none' response and training_outcome
         cleaned_data = {'received_training':
                         ReceivedTrainingOnFeedingList.objects.filter(
-                            short_name='none'),
+                            short_name='training_none'),
                         'training_outcome': 'Some outcome'}
 
         # Call the function and expect it to raise a ValidationError
