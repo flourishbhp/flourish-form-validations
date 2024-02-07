@@ -1,5 +1,5 @@
 from django.forms import ValidationError
-from edc_constants.constants import NEG, OTHER, YES, NONE
+from edc_constants.constants import NEG, YES
 from edc_form_validators import FormValidator
 
 from .crf_form_validator import FormValidatorMixin
@@ -8,19 +8,18 @@ from .crf_form_validator import FormValidatorMixin
 class BreastFeedingQuestionnaireFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
-        self.validate_preg_influence_required()
         self.validate_feeding_hiv_status()
         self.validate_hiv_status_neg()
 
-        self.m2m_other_specify(OTHER,
+        self.m2m_other_specify('dur__other',
                                m2m_field='during_preg_influencers',
                                field_other='during_preg_influencers_other')
 
-        self.m2m_other_specify(OTHER,
+        self.m2m_other_specify('aft_influ_other',
                                m2m_field='after_delivery_influencers',
                                field_other='after_delivery_influencers_other')
 
-        self.m2m_other_specify(OTHER,
+        self.m2m_other_specify('feeding_oth',
                                m2m_field='infant_feeding_reasons',
                                field_other='infant_feeding_other')
 
@@ -38,7 +37,8 @@ class BreastFeedingQuestionnaireFormValidator(FormValidatorMixin, FormValidator)
 
         self.validate_other_specify(field='after_birth_opinion')
 
-        self.m2m_single_selection_if(*[NONE, ], m2m_field='received_training')
+        self.m2m_single_selection_if(
+            *['training_none', ], m2m_field='received_training')
 
         self.validate_training_outcome_required()
 
@@ -57,17 +57,6 @@ class BreastFeedingQuestionnaireFormValidator(FormValidatorMixin, FormValidator)
             self.required_if_true(not hiv_status == NEG,
                                   field_required=field, )
 
-    def validate_preg_influence_required(self):
-        influencers = self.cleaned_data.get('during_preg_influencers')
-        self.required_if_true(influencers != 'OTHER',
-                              field='during_preg_influencers',
-                              field_required='influenced_during_preg')
-
-        influencers = self.cleaned_data.get('after_delivery_influencers')
-        self.required_if_true((influencers != 'OTHER'),
-                              field='after_delivery_influencers',
-                              field_required='influenced_after_delivery')
-
     def validate_feeding_hiv_status(self):
 
         status = self.cleaned_data.get('feeding_hiv_status')
@@ -82,9 +71,9 @@ class BreastFeedingQuestionnaireFormValidator(FormValidatorMixin, FormValidator)
         training_outcome = self.cleaned_data.get('training_outcome')
         if responses and len(responses) > 0:
             for response in responses:
-                if response.short_name != 'none' and training_outcome is None:
+                if response.short_name != 'training_none' and training_outcome is None:
                     raise ValidationError(
                         {'training_outcome': 'This field is required.'})
-                elif response.short_name == 'none' and training_outcome is not None:
+                elif response.short_name == 'training_none' and training_outcome is not None:
                     raise ValidationError(
                         {'training_outcome': 'This field is not required.'})
