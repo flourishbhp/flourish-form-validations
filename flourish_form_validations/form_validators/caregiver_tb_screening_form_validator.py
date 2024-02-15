@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from edc_constants.constants import YES
 from edc_form_validators import FormValidator
 
@@ -25,6 +26,10 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
             field_other='other_test',
         )
 
+        self.required_if(YES,
+                         field='diagnosed_with_TB',
+                         field_required='started_on_TB_treatment')
+
         field_responses = {
             'chest_xray': 'chest_xray_results',
             'sputum_sample': 'sputum_sample_results',
@@ -33,13 +38,19 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
             'blood_test': 'blood_test_results',
         }
 
-        for field, response in field_responses.items():
-            self.m2m_required_if(
+        for response, field in field_responses.items():
+            self.required_if_m2m(
                 response,
                 m2m_field='tb_tests',
                 field=field,
             )
 
-        self.required_if(YES,
-                         field='diagnosed_with_TB',
-                         field_required='started_on_TB_treatment')
+    def required_if_m2m(self, response, field=None, m2m_field=None):
+        m2m_field = self.cleaned_data.get(m2m_field)
+        selected = {obj.short_name: obj.name for obj in m2m_field if
+                    m2m_field is not None}
+        if response:
+            if response not in selected and not self.cleaned_data.get(field):
+                message = {field: 'This field is applicable'}
+                self._errors.update(message)
+                raise ValidationError(message)
