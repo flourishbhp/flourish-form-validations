@@ -2,6 +2,7 @@ from django import forms
 from django.apps import apps as django_apps
 from edc_action_item.site_action_items import site_action_items
 from edc_constants.constants import NO, NEW, NOT_APPLICABLE
+from flourish_caregiver.helper_classes import MaternalStatusHelper
 from flourish_prn.action_items import CAREGIVEROFF_STUDY_ACTION
 from django.core.exceptions import ValidationError
 
@@ -143,3 +144,8 @@ class FormValidatorMixin:
 
     def get_child_subject_identifier(self, instance):
         return getattr(instance, 'child_subject_identifier', None)
+
+    def caregiver_hiv_status(self, subject_identifier):
+        status_helper = MaternalStatusHelper(
+            subject_identifier=subject_identifier)
+        return getattr(status_helper, 'hiv_status', None)
