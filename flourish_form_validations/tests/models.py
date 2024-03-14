@@ -354,3 +354,7 @@ class ChildAssent(BaseUuidModel):
     version = models.CharField(
         max_length=10,
         editable=False)
+
+
+class MestitisActions(ListModelMixin, BaseUuidModel):
+    pass
