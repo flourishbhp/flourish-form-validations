@@ -86,3 +86,4 @@ from .tb_screen_preg_form_validator import TbScreenPregFormValidator
 from .tb_study_eligibility_form_validator import TbStudyEligibilityFormValidator
 from .tb_visit_screening_women_form_validator import TbVisitScreeningWomenFormValidator
 from .ultrasound_form_validator import UltrasoundFormValidator
+from .breast_milk_crf_form_validator import BreastMilkCRFFormValidator
