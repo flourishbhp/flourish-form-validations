@@ -1,4 +1,5 @@
 from edc_form_validators import FormValidator
+from edc_constants.constants import OTHER
 
 
 class SocialWorkReferralValidatorMixin(FormValidator):
@@ -10,12 +11,17 @@ class SocialWorkReferralValidatorMixin(FormValidator):
         caregiver_fields = ['is_preg', 'current_hiv_status']
         for field in caregiver_fields:
             self.required_if(
-                'caregiver', field='referral_for',
+                'caregiver',
+                field='referral_for',
                 field_required=field)
 
         self.required_if('child',
                          field='referral_for',
                          field_required='child_exposure_status')
+    
+        self.required_if(OTHER,
+                         field='referral_loc',
+                         field_required='referral_loc_other')
         super().clean()
 
     def validate_referral_reason(self):
