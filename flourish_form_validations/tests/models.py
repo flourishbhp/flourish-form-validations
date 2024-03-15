@@ -1,9 +1,9 @@
 from django.db import models
 from django.db.models.deletion import PROTECT
-from django_crypto_fields.fields import FirstnameField, IdentityField, LastnameField
+from django_crypto_fields.fields import IdentityField
 from edc_base.model_mixins import BaseUuidModel, ListModelMixin
 from edc_base.utils import get_utcnow
-from edc_constants.choices import GENDER, YES_NO, YES_NO_NA
+from edc_constants.choices import YES_NO, YES_NO_NA
 from edc_registration.model_mixins import UpdatesOrCreatesRegistrationModelMixin
 
 
@@ -142,12 +142,43 @@ class AntenatalEnrollment(BaseUuidModel):
         blank=True)
 
 
+class OnSchedule(BaseUuidModel):
+    subject_identifier = models.CharField(
+        max_length=50)
+    schedule_name = models.CharField(max_length=25, blank=True, null=True)
+
+    child_subject_identifier = models.CharField(
+        max_length=50)
+
+
+class Schedule(BaseUuidModel):
+    subject_identifier = models.CharField(
+        max_length=50)
+
+    child_subject_identifier = models.CharField(
+        max_length=50, blank=True, null=True)
+
+    schedule_name = models.CharField(max_length=25, blank=True, null=True)
+
+    onschedule_model = models.CharField(max_length=25, blank=True, null=True)
+
+
 class Appointment(BaseUuidModel):
     subject_identifier = models.CharField(max_length=25)
 
     appt_datetime = models.DateTimeField(default=get_utcnow)
 
     visit_code = models.CharField(max_length=25)
+
+    visit_code_sequence = models.IntegerField(default=0)
+
+    visit_instance = models.CharField(max_length=25)
+
+    visit_schedule_name = models.CharField(max_length=25)
+
+    @classmethod
+    def related_visit_model_attr(cls):
+        return 'maternalvisit'
 
 
 class MaternalVisit(BaseUuidModel):
@@ -160,6 +191,8 @@ class MaternalVisit(BaseUuidModel):
     visit_code_sequence = models.IntegerField(default=0)
 
     schedule_name = models.CharField(max_length=25, null=True)
+
+    schedule = models.OneToOneField(Schedule, on_delete=PROTECT)
 
     report_datetime = models.DateTimeField(
         default=get_utcnow)
@@ -198,6 +231,15 @@ class MaternalArv(models.Model):
         blank=True)
 
 
+class BirthFeedingVaccine(models.Model):
+    child_visit = models.OneToOneField(MaternalVisit, on_delete=PROTECT)
+    report_datetime = models.DateTimeField(
+        default=get_utcnow)
+    breastfeed_start_dt = models.DateField(
+        null=True,
+        blank=True)
+
+
 class ArvsPrePregnancy(models.Model):
     maternal_visit = models.ForeignKey(MaternalVisit, on_delete=PROTECT)
 
@@ -211,11 +253,10 @@ class ArvsPrePregnancy(models.Model):
 class RegisteredSubject(BaseUuidModel):
     subject_identifier = models.CharField(max_length=25)
 
-    first_name = FirstnameField(null=True)
-
-    last_name = LastnameField(verbose_name="Last name")
-
-    gender = models.CharField(max_length=1, choices=GENDER)
+    relative_identifier = models.CharField(
+        max_length=36,
+        null=True,
+        blank=True)
 
 
 class UltraSound(models.Model):

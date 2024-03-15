@@ -7,6 +7,14 @@ from .crf_form_validator import FormValidatorMixin
 
 
 class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
+    birth_feeding_vaccine_model = 'flourish_child.birthfeedingvaccine'
+
+    @property
+    def birth_feeding_vaccine_model_cls(self):
+        return django_apps.get_model(self.birth_feeding_vaccine_model)
+
+    def onschedule_model_cls(self, onschedule_model):
+        return django_apps.get_model(onschedule_model)
 
     def clean(self):
         required_fields_exp_mastitis = [
@@ -23,7 +31,7 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
         self.required_fields_for_condition("exp_mastitis_count", "mastitis")
         self.required_fields_for_condition("exp_cracked_nipples_count", "cracked_nipples")
 
-        for x in range(1, 5):
+        for x in range(1, 6):
             self.m2m_other_specify(
                 OTHER,
                 m2m_field=f'mastitis_{x}_action',
@@ -180,7 +188,7 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
 
     def get_child_subject_identifier_by_visit(self, visit):
         """Returns the child subject identifier by visit."""
-        onschedule_model_cls = django_apps.get_model(
+        onschedule_model_cls = self.onschedule_model_cls(
             visit.schedule.onschedule_model)
 
         try:
@@ -193,15 +201,12 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
             return onschedule_obj.child_subject_identifier
 
     def get_birth_feeding_vaccine(self, child_subject_identifier, visit_code):
-        birth_feeding_vaccine_model_cls = django_apps.get_model(
-            'flourish_child.birthfeedingvaccine')
-
         try:
-            return birth_feeding_vaccine_model_cls.objects.filter(
+            return self.birth_feeding_vaccine_model_cls.objects.filter(
                 child_visit__subject_identifier=child_subject_identifier,
                 child_visit__visit_code=visit_code
             ).latest('report_datetime')
-        except birth_feeding_vaccine_model_cls.DoesNotExist:
+        except self.birth_feeding_vaccine_model_cls.DoesNotExist:
             return None
 
     def required_repeating_questions(self, condition, field_prefix):
