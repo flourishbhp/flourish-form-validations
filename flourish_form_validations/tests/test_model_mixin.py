@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from edc_constants.constants import POS, NEG, YES
+from edc_constants.constants import NEG, POS, YES
 
 
 class TestModeMixin:
@@ -77,6 +77,8 @@ class TestModeMixin:
 
         validator_class.child_assent_model = \
             'flourish_form_validations.childassent'
+
+        birth_feeding_vaccine_model = 'flourish_form_validations.birthfeedingvaccine'
 
     class Meta:
         abstract = True
