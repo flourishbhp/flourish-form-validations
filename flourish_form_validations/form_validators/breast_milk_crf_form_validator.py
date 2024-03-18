@@ -33,7 +33,7 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
 
         for x in range(1, 6):
             self.m2m_other_specify(
-                OTHER,
+                f'm{x}_{OTHER}',
                 m2m_field=f'mastitis_{x}_action',
                 field_other=f'mastitis_{x}_action_other'
             )
@@ -46,7 +46,7 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
                 breastfeeding_date=f'mastitis_{x}_date_onset')
 
             self.m2m_other_specify(
-                OTHER,
+                f'cn{x}_{OTHER}',
                 m2m_field=f'cracked_nipples_{x}_action',
                 field_other=f'cracked_nipples_{x}_action_other'
             )
@@ -74,7 +74,7 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
             if mastitis_action_field not in sbnrq:
                 for field in sbnrq:
                     self.m2m_other_specify(
-                        'stopped_breastfeeding',
+                        f'm{x}_stopped_breastfeeding',
                         m2m_field=mastitis_action_field,
                         field_other=field
                     )
@@ -98,9 +98,10 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
     def validate_stopped_breastfed(self, m2m_field):
         qs = self.cleaned_data.get(m2m_field)
         excluded_fields = ['add_comments']
+        action_key = self.extract_actions(m2m_field)
         if qs and qs.count() > 0:
             selected = {obj.short_name: obj.name for obj in qs}
-            if 'stopped_breastfeeding' in selected:
+            if f'{action_key}_stopped_breastfeeding' in selected:
                 fields_after_trigger = False
                 for field_name, field_value in self.cleaned_data.items():
                     if fields_after_trigger and field_name not in excluded_fields:
@@ -145,10 +146,12 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
 
         infection_type = self.cleaned_data.get(infection_type)
         m2m_field_options = self.cleaned_data.get(m2m_field)
+        m2m_action_key = self.extract_actions(m2m_field)
 
         if m2m_field_options and m2m_field_options.count() > 0:
             selected = {obj.short_name: obj.name for obj in m2m_field_options}
-            if infection_type != 'unilateral' and 'uninfected_breast' in selected.keys():
+            if ((infection_type != f'{m2m_action_key}_unilateral' and
+                 f'{m2m_action_key}_uninfected_breast' in selected.keys())):
                 message = {
                     m2m_field: 'Breastfed from uninfected breast and pumped and dumped '
                                'from the affected breast” can only be selected if '
@@ -158,7 +161,8 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
                 raise ValidationError(message, code=NOT_REQUIRED_ERROR)
 
             if m2m_field_options.count() > 1:
-                if OTHER not in selected.keys() and m2m_field_options.count() < 3:
+                if (f'{m2m_action_key}_{OTHER}' not in selected.keys() and
+                        m2m_field_options.count() < 3):
                     message = {
                         m2m_field:
                             f'You can only select more than 1 options if you include '
@@ -175,7 +179,8 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
                     self._errors.update(message)
                     self._error_codes.append(INVALID_ERROR)
                     raise ValidationError(message, code=INVALID_ERROR)
-                if ('both_breasts' and 'uninfected_breast') in selected.keys():
+                if ((f'{m2m_action_key}both_breasts' and
+                     f'{m2m_action_key}uninfected_breast') in selected.keys()):
                     message = {
                         m2m_field:
                             f'\'Breastfeed from both breasts\' and \'Breastfed from '
@@ -253,3 +258,14 @@ class BreastMilkCRFFormValidator(FormValidatorMixin, FormValidator):
                     self.required_if(condition_value,
                                      field=condition,
                                      field_required=field)
+
+    def extract_actions(self, field):
+        action_key = ''
+        if field.startswith("mastitis_"):
+            action_number = field.split("_")[1]
+            action_key = f"m{action_number}"
+        elif field.startswith("cracked_nipples_"):
+            action_number = field.split("_")[2]
+            action_key = f"cn{action_number}"
+
+        return action_key
