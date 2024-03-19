@@ -8,7 +8,7 @@ class SocialWorkReferralValidatorMixin(FormValidator):
 
         self.validate_referral_reason()
 
-        caregiver_fields = ['is_preg', 'current_hiv_status']
+        caregiver_fields = ['current_hiv_status']
         for field in caregiver_fields:
             self.required_if(
                 'caregiver',
