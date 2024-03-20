@@ -15,12 +15,14 @@ class CaregiverSafiStigmaFormValidator(FormValidatorMixin, FormValidator):
         fields = [
             'judged',
             'avoided',
-            'discriminated',
+            'insulted',
             'at_home',
             'at_neigborhood',
             'at_religious',
             'at_clinic',
-            'at_workplace',
+            'at_workplace', ]
+
+        discrimination_fields = [
             'finacial_support',
             'social_support',
             'stressed',
@@ -32,7 +34,7 @@ class CaregiverSafiStigmaFormValidator(FormValidatorMixin, FormValidator):
             'emotional_effect',
             'pespective_changed']
 
-        for field in fields + lwhiv_fields:
+        for field in fields + discrimination_fields + lwhiv_fields:
             self.required_if(
                 'ever_happened',
                 field=field,
@@ -47,8 +49,19 @@ class CaregiverSafiStigmaFormValidator(FormValidatorMixin, FormValidator):
                 member_lwhiv or lwhiv,
                 field_applicable=field)
 
-        fields_required = {'other_place': 'other_place_period',
-                           'other_discr': 'other_discr_period'}
+        discriminated = any(
+            [self.cleaned_data.get(field, None) == 'ever_happened' for field in fields])
+        discriminated_at_other = bool(self.cleaned_data.get('other_place', None))
+        for field in discrimination_fields + ['social_effect', 'emotional_effect', ]:
+            self.applicable_if_true(
+                discriminated or discriminated_at_other,
+                field_applicable=field,
+                applicable_msg=(
+                    'This field is applicable, participant experienced discrimination'),
+                not_applicable_msg=(
+                    'This field is not applicable, no discrimination was experienced.'))
+
+        fields_required = {'other_place': 'other_place_period', }
 
         for field, required in fields_required.items():
             self.required_if_not_none(
