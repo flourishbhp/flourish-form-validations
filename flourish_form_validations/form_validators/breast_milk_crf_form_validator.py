@@ -139,7 +139,7 @@ class BreastMilkCRFFormValidator(BreastMilkFormValidatorMixin):
         )
 
         milk_collected_field = ['breast_collected', 'milk_collected_volume',
-                                'last_breastfed']
+                                'last_breastfed', 'recently_ate']
 
         for field in milk_collected_field:
             self.required_if(
