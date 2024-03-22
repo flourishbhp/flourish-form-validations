@@ -51,16 +51,6 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
                     self._errors.update(message)
                     self._error_codes.append(INVALID_ERROR)
                     raise ValidationError(message, code=INVALID_ERROR)
-                if ('both_breasts' and 'uninfected_breast') in selected.keys():
-                    message = {
-                        m2m_field:
-                            f'\'Breastfeed from both breasts\' and \'Breastfed from '
-                            f'uninfected breast and pumped and dumped from the affected '
-                            f'breast\' can not be selected together as they contradict '
-                            f'each other'}
-                    self._errors.update(message)
-                    self._error_codes.append(INVALID_ERROR)
-                    raise ValidationError(message, code=INVALID_ERROR)
 
     def get_child_subject_identifier_by_visit(self, visit):
         """Returns the child subject identifier by visit."""
