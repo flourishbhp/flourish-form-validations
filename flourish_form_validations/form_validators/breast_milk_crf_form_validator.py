@@ -57,14 +57,13 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
         onschedule_model_cls = self.onschedule_model_cls(
             visit.schedule.onschedule_model)
 
-        try:
-            onschedule_obj = onschedule_model_cls.objects.get(
+        if onschedule_model_cls:
+            onschedule_obj = self.get_onschedule_model_obj(
                 subject_identifier=visit.subject_identifier,
-                schedule_name=visit.schedule_name)
-        except onschedule_model_cls.DoesNotExist:
-            return None
-        else:
-            return onschedule_obj.child_subject_identifier
+                schedule_name=visit.schedule_name,
+                model_cls=onschedule_model_cls
+            )
+            return onschedule_obj.child_subject_identifier if onschedule_obj else None
 
     def get_birth_feeding_vaccine(self, child_subject_identifier, visit_code):
         try:
@@ -96,7 +95,8 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
                     message = {
                         breastfeeding_date: f'Date cannot be before breastfeeding '
                                             f'initiation date on the infant feeding '
-                                            f'form at birth visit'}
+                                            f'form at birth visit, '
+                                            f'{infant_feeding.breastfeed_start_dt}'}
             else:
                 message = ('could not find birth feeding and vaccine object for child '
                            f'{child_subject_identifier} at 2000D visit')
