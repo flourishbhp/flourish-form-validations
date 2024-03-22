@@ -1,6 +1,8 @@
 from .antenatal_enrollment_form_validation import \
     AntenatalEnrollmentFormValidator
 from .arvs_pre_pregnancy_form_validation import ArvsPrePregnancyFormValidator
+from .breast_milk_crf_form_validator import BreastMilkCRFFormValidator, \
+    MastitisInlineFormValidator
 from .breastfeeding_questionnaire_form_validator import \
     BreastFeedingQuestionnaireFormValidator
 from .brief_danger_assessment_form_validator import BriefDangerAssessmentFormValidator

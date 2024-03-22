@@ -48,7 +48,7 @@ class TestMedicalHistoryForm(TestModeMixin, TestCase):
             appointment=appointment)
 
         self.registered_subject = RegisteredSubject.objects.create(
-            first_name='First_Name', last_name='Last_Name', gender=MALE)
+            subject_identifier = '12345ABC')
 
         self.subject_identifier = '12345ABC'
 
