@@ -20,12 +20,6 @@ class CaregiverContactFormValidator(FormValidatorMixin, FormValidator):
         self.validate_against_consent_datetime(self.cleaned_data.get('report_datetime'))
 
         self.required_if(
-            're_appointment',
-            field='call_reason',
-            field_required='call_rescheduled',
-        )
-
-        self.required_if(
             YES,
             field='call_rescheduled',
             field_required='reason_rescheduled',
