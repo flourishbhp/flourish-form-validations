@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator, INVALID_ERROR, NOT_REQUIRED_ERROR
 
+from flourish_caregiver.constants import BREASTFEED_ONLY
+
 from .crf_form_validator import FormValidatorMixin
 
 
@@ -90,20 +92,20 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
                 child_subject_identifier=child_subject_identifier,
                 visit_code='2000D'
             )
-            if infant_feeding:
-                if infant_feeding.breastfeed_start_dt > breastfeeding_date_value:
-                    message = {
-                        breastfeeding_date: f'Date cannot be before breastfeeding '
-                                            f'initiation date on the infant feeding '
-                                            f'form at birth visit, '
-                                            f'{infant_feeding.breastfeed_start_dt}'}
+            if infant_feeding and breastfeeding_date_value:
+                if infant_feeding.feeding_after_delivery == BREASTFEED_ONLY or infant_feeding.feeding_after_delivery == 'Both breastfeeding and formula feeding':
+                    if infant_feeding.breastfeed_start_dt > breastfeeding_date_value:
+                        message = {
+                            breastfeeding_date: f'Date cannot be before breastfeeding '
+                                                f'initiation date on the infant feeding '
+                                                f'form at birth visit, '
+                                                f'{infant_feeding.breastfeed_start_dt}'}
+                else:
+                    message = ('This participant did not breast feed')
             else:
-                message = ('could not find birth feeding and vaccine object for child '
-                           f'{child_subject_identifier} at 2000D visit')
-        else:
-            message = 'could not find related child identifier'
-        if message:
-            raise ValidationError(message)
+                message = 'could not find related child identifier'
+            if message:
+                raise ValidationError(message)
 
 
 class BreastMilkCRFFormValidator(BreastMilkFormValidatorMixin):
@@ -143,7 +145,8 @@ class MastitisInlineFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        self.validate_breastfeeding_date(breastfeeding_date='mastitis_date_onset')
+        self.validate_breastfeeding_date(
+            breastfeeding_date='mastitis_date_onset')
         self.m2m_other_specify(
             OTHER,
             m2m_field='mastitis_action',
@@ -157,7 +160,8 @@ class CrackedNipplesInlineFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        self.validate_breastfeeding_date(breastfeeding_date='cracked_nipples_date_onset')
+        self.validate_breastfeeding_date(
+            breastfeeding_date='cracked_nipples_date_onset')
         self.m2m_other_specify(
             OTHER,
             m2m_field='cracked_nipples_action',
