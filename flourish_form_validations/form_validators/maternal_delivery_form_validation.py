@@ -13,7 +13,7 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
     maternal_arv_model = 'flourish_caregiver.maternalarv'
     maternal_visit_model = 'flourish_caregiver.maternalvisit'
     ultrasound_model = 'flourish_caregiver.ultrasound'
-    arvs_pre_pregnancy = 'flourish_caregiver.arvsprepregnancy'
+    arv_during_preg_model = 'flourish_caregiver.maternalarvtableduringpreg'
 
     @property
     def ultrasound_cls(self):
@@ -28,14 +28,15 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
         return django_apps.get_model(self.maternal_arv_model)
 
     @property
-    def arvs_pre_pregnancy_cls(self):
-        return django_apps.get_model(self.arvs_pre_pregnancy)
+    def arvs_during_pregnancy_cls(self):
+        return django_apps.get_model(self.arv_during_preg_model)
 
     def clean(self):
         self.subject_identifier = self.cleaned_data.get('subject_identifier')
 
         super().clean()
-        self.validate_against_consent_datetime(self.cleaned_data.get('report_datetime'))
+        self.validate_against_consent_datetime(
+            self.cleaned_data.get('report_datetime'))
 
         condition = self.cleaned_data.get(
             'mode_delivery') and 'c-section' in self.cleaned_data.get('mode_delivery')
@@ -165,13 +166,15 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
 
         subject_identifier = self.cleaned_data.get('subject_identifier')
 
+        arv_initiation_date = self.cleaned_data.get('arv_initiation_date')
+
         try:
-            pre_pregnancy = self.arvs_pre_pregnancy_cls.objects.get(
-                maternal_visit__subject_identifier=subject_identifier)
-        except self.arvs_pre_pregnancy_cls.DoesNotExist:
+            during_pregnancy = self.arvs_during_pregnancy_cls.objects.filter(
+                maternal_arv_durg_preg__maternal_visit__subject_identifier=subject_identifier).latest('-start_date')
+        except self.arvs_during_pregnancy_cls.DoesNotExist:
             pass
         else:
-            if pre_pregnancy.art_start_date != self.cleaned_data.get('arv_initiation_date'):
+            if during_pregnancy.start_date != arv_initiation_date:
                 raise ValidationError(
                     {'arv_initiation_date': 'Date not corresponding with the date from '
-                     f'Arv Pregnancy CRF, the date should be {pre_pregnancy.art_start_date} '})
+                     f'Arv Pregnancy CRF, the date should be {during_pregnancy.start_date} '})
