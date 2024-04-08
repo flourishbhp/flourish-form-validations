@@ -9,6 +9,25 @@ from .crf_form_validator import FormValidatorMixin
 
 
 class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
+    def clean(self):
+        super().clean()
+        responses = ['yes_currently', 'yes_resolved']
+        self.required_if_true(
+            self.cleaned_data.get('exp_mastitis') in responses,
+            field_required='exp_mastitis_count',
+        )
+
+        self.required_if(
+            YES,
+            field_required='exp_cracked_nipples_count',
+            field='exp_cracked_nipples'
+        )
+
+        self.required_if(
+            NO,
+            field_required='not_collected_reasons',
+            field='milk_collected'
+        )
     birth_feeding_vaccine_model = 'flourish_child.birthfeedingvaccine'
 
     @property
@@ -108,28 +127,25 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
                 raise ValidationError(message)
 
 
+class BreastMilk6MonthsCRFFormValidator(BreastMilkFormValidatorMixin):
+
+    def clean(self):
+        super().clean()
+        milk_collected_field = ['breast_collected', 'milk_collected_volume',
+                                'last_breastfed']
+
+        for field in milk_collected_field:
+            self.required_if(
+                YES,
+                field_required=field,
+                field='milk_collected'
+            )
+
+
 class BreastMilkCRFFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        responses = ['yes_currently', 'yes_resolved']
-        self.required_if_true(
-            self.cleaned_data.get('exp_mastitis') in responses,
-            field_required='exp_mastitis_count',
-        )
-
-        self.required_if(
-            YES,
-            field_required='exp_cracked_nipples_count',
-            field='exp_cracked_nipples'
-        )
-
-        self.required_if(
-            NO,
-            field_required='not_collected_reasons',
-            field='milk_collected'
-        )
-
         milk_collected_field = ['breast_collected', 'milk_collected_volume',
                                 'last_breastfed', 'recently_ate']
 
