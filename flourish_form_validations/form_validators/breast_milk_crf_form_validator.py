@@ -3,10 +3,31 @@ from django.core.exceptions import ValidationError
 from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator, INVALID_ERROR, NOT_REQUIRED_ERROR
 
+from flourish_caregiver.constants import BREASTFEED_ONLY
+
 from .crf_form_validator import FormValidatorMixin
 
 
 class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
+    def clean(self):
+        super().clean()
+        responses = ['yes_currently', 'yes_resolved']
+        self.required_if_true(
+            self.cleaned_data.get('exp_mastitis') in responses,
+            field_required='exp_mastitis_count',
+        )
+
+        self.required_if(
+            YES,
+            field_required='exp_cracked_nipples_count',
+            field='exp_cracked_nipples'
+        )
+
+        self.required_if(
+            NO,
+            field_required='not_collected_reasons',
+            field='milk_collected'
+        )
     birth_feeding_vaccine_model = 'flourish_child.birthfeedingvaccine'
 
     @property
@@ -90,44 +111,41 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
                 child_subject_identifier=child_subject_identifier,
                 visit_code='2000D'
             )
-            if infant_feeding:
-                if infant_feeding.breastfeed_start_dt > breastfeeding_date_value:
-                    message = {
-                        breastfeeding_date: f'Date cannot be before breastfeeding '
-                                            f'initiation date on the infant feeding '
-                                            f'form at birth visit, '
-                                            f'{infant_feeding.breastfeed_start_dt}'}
+            if infant_feeding and breastfeeding_date_value:
+                if infant_feeding.feeding_after_delivery == BREASTFEED_ONLY or infant_feeding.feeding_after_delivery == 'Both breastfeeding and formula feeding':
+                    if infant_feeding.breastfeed_start_dt > breastfeeding_date_value:
+                        message = {
+                            breastfeeding_date: f'Date cannot be before breastfeeding '
+                                                f'initiation date on the infant feeding '
+                                                f'form at birth visit, '
+                                                f'{infant_feeding.breastfeed_start_dt}'}
+                else:
+                    message = ('This participant did not breast feed')
             else:
-                message = ('could not find birth feeding and vaccine object for child '
-                           f'{child_subject_identifier} at 2000D visit')
-        else:
-            message = 'could not find related child identifier'
-        if message:
-            raise ValidationError(message)
+                message = 'could not find related child identifier'
+            if message:
+                raise ValidationError(message)
+
+
+class BreastMilk6MonthsCRFFormValidator(BreastMilkFormValidatorMixin):
+
+    def clean(self):
+        super().clean()
+        milk_collected_field = ['breast_collected', 'milk_collected_volume',
+                                'last_breastfed']
+
+        for field in milk_collected_field:
+            self.required_if(
+                YES,
+                field_required=field,
+                field='milk_collected'
+            )
 
 
 class BreastMilkCRFFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        responses = ['yes_currently', 'yes_resolved']
-        self.required_if_true(
-            self.cleaned_data.get('exp_mastitis') in responses,
-            field_required='exp_mastitis_count',
-        )
-
-        self.required_if(
-            YES,
-            field_required='exp_cracked_nipples_count',
-            field='exp_cracked_nipples'
-        )
-
-        self.required_if(
-            NO,
-            field_required='not_collected_reasons',
-            field='milk_collected'
-        )
-
         milk_collected_field = ['breast_collected', 'milk_collected_volume',
                                 'last_breastfed', 'recently_ate']
 
@@ -143,7 +161,8 @@ class MastitisInlineFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        self.validate_breastfeeding_date(breastfeeding_date='mastitis_date_onset')
+        self.validate_breastfeeding_date(
+            breastfeeding_date='mastitis_date_onset')
         self.m2m_other_specify(
             OTHER,
             m2m_field='mastitis_action',
@@ -157,7 +176,8 @@ class CrackedNipplesInlineFormValidator(BreastMilkFormValidatorMixin):
 
     def clean(self):
         super().clean()
-        self.validate_breastfeeding_date(breastfeeding_date='cracked_nipples_date_onset')
+        self.validate_breastfeeding_date(
+            breastfeeding_date='cracked_nipples_date_onset')
         self.m2m_other_specify(
             OTHER,
             m2m_field='cracked_nipples_action',
