@@ -55,7 +55,7 @@ class CaregiverContactFormValidator(FormValidatorMixin, FormValidator):
             self._errors.update(msg)
             raise ValidationError(msg)
 
-        self.validate_other_specify(field='call_outcome_other')
+        self.validate_other_specify(field='call_outcome')
 
         self.required_if(
             YES,
