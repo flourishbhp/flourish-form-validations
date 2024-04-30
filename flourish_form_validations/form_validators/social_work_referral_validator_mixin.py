@@ -22,7 +22,7 @@ class SocialWorkReferralValidatorMixin(FormValidator):
         self.required_if('child',
                          field='referral_for',
                          field_required='child_exposure_status')
-    
+
         self.required_if(OTHER,
                          field='referral_loc',
                          field_required='referral_loc_other')
@@ -46,4 +46,5 @@ class SocialWorkReferralValidatorMixin(FormValidator):
             else:
                 self.required_if_true(
                     value in selected,
-                    field_required=field)
+                    field_required=field,
+                    inverse=False)
