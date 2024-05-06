@@ -107,18 +107,18 @@ class BreastMilkFormValidatorMixin(FormValidatorMixin, FormValidator):
             visit=maternal_visit
         )
         if child_subject_identifier:
-            infant_feeding = self.get_birth_feeding_vaccine(
+            birth_feeding_vac = self.get_birth_feeding_vaccine(
                 child_subject_identifier=child_subject_identifier,
                 visit_code='2000D'
             )
-            if infant_feeding and breastfeeding_date_value:
-                if infant_feeding.feeding_after_delivery == BREASTFEED_ONLY or infant_feeding.feeding_after_delivery == 'Both breastfeeding and formula feeding':
-                    if infant_feeding.breastfeed_start_dt > breastfeeding_date_value:
+            if birth_feeding_vac and breastfeeding_date_value:
+                if birth_feeding_vac.feeding_after_delivery == 'breastfeeding_only' or birth_feeding_vac.feeding_after_delivery == 'Both breastfeeding and formula feeding':
+                    if birth_feeding_vac.breastfeed_start_dt > breastfeeding_date_value:
                         message = {
                             breastfeeding_date: f'Date cannot be before breastfeeding '
                                                 f'initiation date on the infant feeding '
                                                 f'form at birth visit, '
-                                                f'{infant_feeding.breastfeed_start_dt}'}
+                                                f'{birth_feeding_vac.breastfeed_start_dt}'}
                 else:
                     message = ('This participant did not breast feed')
             else:
