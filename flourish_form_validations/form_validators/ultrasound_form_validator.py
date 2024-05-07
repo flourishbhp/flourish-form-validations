@@ -54,7 +54,7 @@ class UltrasoundFormValidator(FormValidatorMixin, FormValidator):
         if cleaned_data.get('ga_by_ultrasound_wks') and (
                 cleaned_data.get('ga_by_ultrasound_wks') > 40):
             msg = {'ga_by_ultrasound_wks':
-                       'GA by ultrasound cannot be greater than 40 weeks.'}
+                   'GA by ultrasound cannot be greater than 40 weeks.'}
 
             self._errors.update(msg)
             raise ValidationError(msg)
@@ -62,7 +62,7 @@ class UltrasoundFormValidator(FormValidatorMixin, FormValidator):
         if cleaned_data.get('ga_by_ultrasound_days') and (
                 cleaned_data.get('ga_by_ultrasound_days') > 7):
             msg = {'ga_by_ultrasound_days':
-                       'GA by ultrasound days cannot be greater than 7 days.'}
+                   'GA by ultrasound days cannot be greater than 7 days.'}
 
             self._errors.update(msg)
             raise ValidationError(msg)
@@ -83,8 +83,8 @@ class UltrasoundFormValidator(FormValidatorMixin, FormValidator):
 
                     if (int(weeks_between) + 1) not in range(39, 42):
                         msg = {'est_edd_ultrasound':
-                                   f'Estimated edd by ultrasound {est_edd_ultrasound} '
-                                   'should match GA by ultrasound'}
+                               f'Estimated edd by ultrasound {est_edd_ultrasound} '
+                               'should match GA by ultrasound'}
                         self._errors.update(msg)
                         raise ValidationError(msg)
 
