@@ -262,15 +262,15 @@ class SubjectConsentFormValidator(ConsentsFormValidatorMixin,
          dob's across different consent versions
         """
         try:
-            previous_consent_obj = self.subject_consent_cls.objects.get(
+            previous_consent_obj = self.subject_consent_cls.objects.filter(
                 screening_identifier=self.cleaned_data.get(
                     'screening_identifier'),
-            )
+            ).latest('consent_datetime')
         except self.subject_consent_cls.DoesNotExist:
             pass
         else:
             dob = self.cleaned_data.get('dob')
-            consent_dob = previous_consent_obj.dob
+            consent_dob = previous_consent_obj
             if dob != consent_dob:
                 message = {'dob':
                                f'In previous consent(s) the subject\'s date of birth of '
