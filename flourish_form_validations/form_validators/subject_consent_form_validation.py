@@ -270,7 +270,7 @@ class SubjectConsentFormValidator(ConsentsFormValidatorMixin,
             pass
         else:
             dob = self.cleaned_data.get('dob')
-            consent_dob = previous_consent_obj
+            consent_dob = previous_consent_obj.dob
             if dob != consent_dob:
                 message = {'dob':
                                f'In previous consent(s) the subject\'s date of birth of '
