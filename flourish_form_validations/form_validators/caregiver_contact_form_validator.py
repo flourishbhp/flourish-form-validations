@@ -60,7 +60,7 @@ class CaregiverContactFormValidator(FormValidatorMixin, FormValidator):
         self.required_if(
             YES,
             field='contact_success',
-            field_required='contact_comment',
+            field_required='call_outcome',
             inverse=False)
 
         self.validate_other_specify(
