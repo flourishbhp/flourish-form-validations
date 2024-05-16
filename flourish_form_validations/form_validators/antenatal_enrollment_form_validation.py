@@ -37,7 +37,6 @@ class AntenatalEnrollmentFormValidator(FormValidatorMixin,
 
         self.validate_current_hiv_status()
 
-
     def validate_current_hiv_status(self):
         if (self.cleaned_data.get('week32_test') == NO and
                 self.cleaned_data.get('current_hiv_status') in [POS, NEG, IND]):
