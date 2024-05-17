@@ -20,6 +20,12 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
                          field='evaluated_for_tb',
                          field_required='clinic_visit_date')
 
+        self.m2m_required_if(
+            YES,
+            m2m_field='tb_tests',
+            field='evaluated_for_tb',
+        )
+
         self.m2m_other_specify(
             OTHER,
             m2m_field='tb_tests',
