@@ -1,4 +1,4 @@
-from edc_constants.constants import OTHER, YES
+from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator
 
 from .crf_form_validator import FormValidatorMixin
@@ -17,6 +17,12 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
                 field='tb_evaluation',
                 field_required=field
             )
+
+        self.required_if(
+            NO,
+            field='tb_evaluation',
+            field_required='reasons',
+        )
 
         self.validate_other_specify(
             field='clinic_name',
