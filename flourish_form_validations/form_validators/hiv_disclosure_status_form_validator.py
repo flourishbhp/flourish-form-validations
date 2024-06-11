@@ -2,7 +2,7 @@ from django.apps import apps as django_apps
 from django.core.exceptions import ValidationError
 from edc_base.utils import age, get_utcnow
 from edc_constants.choices import YES
-from edc_constants.constants import OTHER
+from edc_constants.constants import NO, OTHER
 from edc_form_validators import FormValidator
 
 from .crf_form_validator import FormValidatorMixin
@@ -38,18 +38,30 @@ class HIVDisclosureStatusFormValidator(FormValidatorMixin, FormValidator):
             self.required_if(OTHER, field=field,
                              field_required=other_specify_field)
 
+        self.m2m_required_if(
+            NO,
+            field='disclosure_intentional',
+            m2m_field='unintentional_disclosure_reason'
+        )
+
+        self.m2m_other_specify(
+            OTHER,
+            m2m_field='unintentional_disclosure_reason',
+            field_other='unintentional_disclosure_other'
+        )
+
         self.validate_child_age()
 
     def validate_child_age(self):
         disclosure_age = self.cleaned_data.get('disclosure_age')
         if self.child_ages and disclosure_age:
             if (not any(
-                child_age > disclosure_age for child_age in self.child_ages)):
+                    child_age > disclosure_age for child_age in self.child_ages)):
                 raise ValidationError(
                     {'disclosure_age':
-                     'Caregiver does not have a child older than age you '
-                     f'provided for disclosure age. The oldest child is '
-                     f'{max(self.child_ages)} years old.'})
+                         'Caregiver does not have a child older than age you '
+                         f'provided for disclosure age. The oldest child is '
+                         f'{max(self.child_ages)} years old.'})
 
     @property
     def child_ages(self):
