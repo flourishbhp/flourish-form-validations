@@ -1,6 +1,7 @@
-from edc_constants.constants import OTHER, YES
+from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator
 
+from flourish_caregiver.constants import NONE
 from flourish_child_validations.form_validators import ChildFormValidatorMixin
 
 
@@ -30,6 +31,36 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
             OTHER,
             m2m_field='tb_tests',
             field_other='other_test',
+        )
+
+        self.m2m_other_specify(
+            NONE,
+            m2m_field='tb_tests',
+            field_other='diagnosed_with_TB',
+        )
+
+        self.validate_other_specify(
+            field='diagnosed_with_TB',
+        )
+
+        self.required_if(
+            YES,
+            required_field='started_on_TB_treatment',
+            field='diagnosed_with_TB',
+        )
+
+        self.validate_other_specify(
+            field='started_on_TB_treatment',
+        )
+
+        self.required_if(
+            NO,
+            required_field='started_on_TB_preventative_therapy',
+            field='diagnosed_with_TB',
+        )
+
+        self.validate_other_specify(
+            field='started_on_TB_preventative_therapy'
         )
 
         self.required_if(YES,
