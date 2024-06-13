@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 
 from .crf_form_validator import FormValidatorMixin
 from .social_work_referral_validator_mixin import SocialWorkReferralValidatorMixin
-
+from edc_constants.constants import UNKNOWN,UNK
 
 class CaregiverSocialWorkReferralFormValidator(
         FormValidatorMixin, SocialWorkReferralValidatorMixin):
@@ -17,6 +17,9 @@ class CaregiverSocialWorkReferralFormValidator(
         current_hiv_status = self.cleaned_data.get(
             'current_hiv_status', None)
         if current_hiv_status and current_hiv_status != hiv_status:
-            raise ValidationError({
-                'current_hiv_status':
-                f'Participant is {hiv_status}, please correct for current HIV status'})
+            if current_hiv_status == UNKNOWN:
+                current_hiv_status = UNK
+            else:
+                raise ValidationError({
+                    'current_hiv_status':
+                    f'Participant is {hiv_status}, please correct for current HIV status'})
