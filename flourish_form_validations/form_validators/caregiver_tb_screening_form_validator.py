@@ -45,7 +45,7 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
 
         self.required_if(
             YES,
-            required_field='started_on_TB_treatment',
+            field_required='started_on_TB_treatment',
             field='diagnosed_with_TB',
         )
 
@@ -55,7 +55,7 @@ class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
 
         self.required_if(
             NO,
-            required_field='started_on_TB_preventative_therapy',
+            field_required='started_on_TB_preventative_therapy',
             field='diagnosed_with_TB',
         )
 
