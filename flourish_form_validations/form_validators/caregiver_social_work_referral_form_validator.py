@@ -16,10 +16,10 @@ class CaregiverSocialWorkReferralFormValidator(
             self.subject_identifier)
         current_hiv_status = self.cleaned_data.get(
             'current_hiv_status', None)
+    
+        if current_hiv_status == UNKNOWN:
+            current_hiv_status = UNK
         if current_hiv_status and current_hiv_status != hiv_status:
-            if current_hiv_status == UNKNOWN:
-                current_hiv_status = UNK
-            else:
-                raise ValidationError({
-                    'current_hiv_status':
-                    f'Participant is {hiv_status}, please correct for current HIV status'})
+                    raise ValidationError({
+                        'current_hiv_status':
+                        f'Participant is {hiv_status}, please correct for current HIV status'})
