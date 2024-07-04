@@ -1,14 +1,12 @@
-from edc_constants.constants import NO, OTHER, YES
+from edc_constants.constants import NO, NONE, OTHER, YES
 from edc_form_validators import FormValidator
 
-from flourish_caregiver.constants import NONE
 from .crf_form_validator import FormValidatorMixin
 
 
 class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
-        breakpoint()
         super().clean()
 
         required_fields = ['cough', 'fever', 'sweats', 'weight_loss']
