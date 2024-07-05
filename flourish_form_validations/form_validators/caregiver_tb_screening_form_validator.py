@@ -1,11 +1,10 @@
-from edc_constants.constants import NO, OTHER, YES
+from edc_constants.constants import NO, NONE, OTHER, YES
 from edc_form_validators import FormValidator
 
-from flourish_caregiver.constants import NONE
-from flourish_child_validations.form_validators import ChildFormValidatorMixin
+from .crf_form_validator import FormValidatorMixin
 
 
-class CaregiverTBScreeningFormValidator(ChildFormValidatorMixin, FormValidator):
+class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
         super().clean()
