@@ -170,7 +170,7 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
         confirm_values = self.cleaned_data.get('confirm_values')
         visit_code = self.cleaned_data.get('maternal_visit').visit_code
 
-        if visit_code == '3000M':
+        if visit_code in  ['3000M','3000A','3000B','3000C']:
 
             if (self.check_all_cm_3000
                     and obtained_all_cm == YES and confirm_values != YES):
