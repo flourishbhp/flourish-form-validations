@@ -1,12 +1,13 @@
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
-from django.test import TestCase, tag
+from django.test import tag, TestCase
 from edc_base.utils import get_utcnow
-from edc_constants.constants import YES, NO
+from edc_constants.constants import NO, YES
 
-from ..form_validators import CaregiverClinicalMeasurementsFormValidator
-from .models import SubjectConsent, MaternalVisit, Appointment, FlourishConsentVersion
+from .models import Appointment, FlourishConsentVersion, MaternalVisit, OnSchedule, \
+    Schedule, SubjectConsent
 from .test_model_mixin import TestModeMixin
+from ..form_validators import CaregiverClinicalMeasurementsFormValidator
 
 
 @tag('ccm')
@@ -28,6 +29,22 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
             consent_datetime=get_utcnow(),
             version='1')
 
+        self.on_schedule_model = OnSchedule.objects.create(
+            subject_identifier=self.subject_consent.subject_identifier,
+            child_subject_identifier='12313',
+            schedule_name='cohort_a_enrollment', )
+
+        self.on_schedule_model.save()
+
+        self.schedule = Schedule.objects.create(
+            subject_identifier=self.subject_consent.subject_identifier,
+            child_subject_identifier='12313',
+            schedule_name=self.on_schedule_model.schedule_name,
+            onschedule_model='flourish_form_validations.onschedule'
+        )
+
+        self.schedule.save()
+
         appointment = Appointment.objects.create(
             subject_identifier=self.subject_consent.subject_identifier,
             appt_datetime=get_utcnow(),
@@ -36,7 +53,10 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,
+        )
 
         self.options = {
             'maternal_visit': self.maternal_visit,
@@ -53,7 +73,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -76,7 +98,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -104,7 +128,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -131,7 +157,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -158,7 +186,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -185,7 +215,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -214,7 +246,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -240,7 +274,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -267,7 +303,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -293,7 +331,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -321,7 +361,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -351,7 +393,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -414,7 +458,9 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         self.maternal_visit = MaternalVisit.objects.create(
             appointment=appointment,
             subject_identifier=self.subject_consent.subject_identifier,
-            report_datetime=get_utcnow())
+            report_datetime=get_utcnow(),
+            schedule=self.schedule,
+            schedule_name=self.on_schedule_model.schedule_name,)
 
         cleaned_data = {
             'maternal_visit': self.maternal_visit,
@@ -429,7 +475,3 @@ class TestCaregiverClinicalMeasurementsForm(TestModeMixin, TestCase):
         
         
         self.assertRaises(ValidationError, form_validator.validate)
-        # try:
-        #     form_validator.validate()
-        # except ValidationError as e:
-        #     self.fail(f'ValidationError unexpectedly raised. Got{e}')
