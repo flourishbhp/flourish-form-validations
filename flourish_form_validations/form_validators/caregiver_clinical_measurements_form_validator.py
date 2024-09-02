@@ -60,10 +60,8 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
         weight_kg = self.cleaned_data.get('weight_kg')
         systolic_bp = self.cleaned_data.get('systolic_bp')
         diastolic_bp = self.cleaned_data.get('diastolic_bp')
-        hip_circ = self.cleaned_data.get('hip_circ')
-        waist_circ = self.cleaned_data.get('waist_circ')
 
-        cm_all = [height, weight_kg, systolic_bp, diastolic_bp, hip_circ, waist_circ]
+        cm_all = [height, weight_kg, systolic_bp, diastolic_bp]
 
         return not any(item is None for item in cm_all)
 
