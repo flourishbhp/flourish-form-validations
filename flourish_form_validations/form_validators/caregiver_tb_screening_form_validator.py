@@ -32,19 +32,13 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
             field_other='other_test',
         )
 
-        self.m2m_other_specify(
-            NONE,
-            m2m_field='tb_tests',
-            field_other='diagnosed_with_TB',
+        self.required_if(
+            YES,
+            field='evaluated_for_tb',
+            field_required='diagnosed_with_TB',
         )
 
         self.validate_other_specify(
-            field='diagnosed_with_TB',
-        )
-
-        self.required_if(
-            YES,
-            field_required='started_on_TB_treatment',
             field='diagnosed_with_TB',
         )
 
@@ -79,4 +73,18 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
                 response,
                 m2m_field='tb_tests',
                 field_other=field,
+            )
+
+        self.validate_started_on_tb_treatment()
+
+    def validate_started_on_tb_treatment(self):
+        qs = self.cleaned_data.get('tb_tests')
+        diagnosed_with_TB = self.cleaned_data.get('diagnosed_with_TB')
+
+        if qs and qs.count() > 0:
+            selected = {obj.short_name: obj.name for obj in qs}
+
+            self.required_if_true(
+                NONE in selected or diagnosed_with_TB == YES,
+                field_required='started_on_TB_treatment',
             )
