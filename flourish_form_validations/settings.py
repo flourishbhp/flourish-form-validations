@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -62,8 +62,6 @@ INSTALLED_APPS = [
     'edc_timepoint.apps.AppConfig',
     'edc_appointment.apps.AppConfig',
     'flourish_form_validations.apps.AppConfig',
-
-
 ]
 
 MIDDLEWARE = [

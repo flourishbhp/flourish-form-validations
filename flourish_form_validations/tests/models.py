@@ -192,7 +192,7 @@ class MaternalVisit(BaseUuidModel):
 
     schedule_name = models.CharField(max_length=25, null=True)
 
-    schedule = models.OneToOneField(Schedule, on_delete=PROTECT)
+    schedule = models.ForeignKey(Schedule, on_delete=PROTECT)
 
     report_datetime = models.DateTimeField(
         default=get_utcnow)
