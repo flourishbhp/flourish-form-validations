@@ -59,9 +59,9 @@ class HIVDisclosureStatusFormValidator(FormValidatorMixin, FormValidator):
                     child_age > disclosure_age for child_age in self.child_ages)):
                 raise ValidationError(
                     {'disclosure_age':
-                         'Caregiver does not have a child older than age you '
-                         f'provided for disclosure age. The oldest child is '
-                         f'{max(self.child_ages)} years old.'})
+                     'Caregiver does not have a child older than age you '
+                     f'provided for disclosure age. The oldest child is '
+                     f'{max(self.child_ages)} years old.'})
 
     @property
     def child_ages(self):
@@ -76,7 +76,9 @@ class HIVDisclosureStatusFormValidator(FormValidatorMixin, FormValidator):
 
     @property
     def child_caregiver_consent_objs(self):
+        child_identifier = self.cleaned_data.get('associated_child_identifier', None)
+
         child_caregiver_consent_model_cls = django_apps.get_model(
             self.caregiver_child_consent_model)
         return child_caregiver_consent_model_cls.objects.filter(
-            subject_consent__subject_identifier=self.subject_identifier)
+            subject_identifier=child_identifier)
