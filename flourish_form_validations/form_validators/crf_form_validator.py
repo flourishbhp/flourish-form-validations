@@ -5,6 +5,7 @@ from edc_constants.constants import NO, NEW, NOT_APPLICABLE
 from flourish_caregiver.helper_classes import MaternalStatusHelper
 from flourish_prn.action_items import CAREGIVEROFF_STUDY_ACTION
 from django.core.exceptions import ValidationError
+from edc_base.utils import get_utcnow
 
 
 class FormValidatorMixin:
@@ -73,6 +74,7 @@ class FormValidatorMixin:
         action_cls = site_action_items.get(
             self.caregiver_offstudy_cls.action_name)
         action_item_model_cls = action_cls.action_item_model_cls()
+        report_datetime = self.cleaned_data.get('report_datetime', get_utcnow())
 
         try:
             action_item_model_cls.objects.get(
@@ -82,7 +84,8 @@ class FormValidatorMixin:
         except action_item_model_cls.DoesNotExist:
             try:
                 self.caregiver_offstudy_cls.objects.get(
-                    subject_identifier=self.subject_identifier)
+                    subject_identifier=self.subject_identifier,
+                    offstudy_date__lt=report_datetime.date())
             except self.caregiver_offstudy_cls.DoesNotExist:
                 pass
             else:
