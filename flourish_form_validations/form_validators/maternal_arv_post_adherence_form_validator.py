@@ -45,7 +45,6 @@ class MaternalArvPostAdherenceFormValidator(FormValidatorMixin, FormValidator):
             *selections,
             m2m_field='stopped_art_reasons')
 
-
     def validate_interruption_reason_against_missed_arv(self, cleaned_data):
         if cleaned_data.get('missed_arv', None) is not None:
             self.m2m_applicable_if_true(

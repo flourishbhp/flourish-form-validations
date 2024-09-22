@@ -145,27 +145,27 @@ class CaregiverChildConsentFormValidator(FormValidator):
             if cleaned_data.get('identity') != cleaned_data.get(
                     'confirm_identity'):
                 msg = {'identity':
-                           '\'Identity\' must match \'confirm identity\'.'}
+                       '\'Identity\' must match \'confirm identity\'.'}
                 self._errors.update(msg)
                 raise ValidationError(msg)
             if cleaned_data.get('identity_type') in ['country_id',
                                                      'birth_cert']:
                 if len(cleaned_data.get('identity')) != 9:
                     msg = {'identity':
-                               'Country identity provided should contain 9 values. '
-                               'Please correct.'}
+                           'Country identity provided should contain 9 values. '
+                           'Please correct.'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
                 gender = cleaned_data.get('gender')
                 if gender == FEMALE and cleaned_data.get('identity')[4] != '2':
                     msg = {'identity':
-                               'Participant gender is Female. Please correct '
-                               'identity number.'}
+                           'Participant gender is Female. Please correct '
+                           'identity number.'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
                 elif gender == MALE and cleaned_data.get('identity')[4] != '1':
                     msg = {'identity':
-                               'Participant is Male. Please correct identity number.'}
+                           'Participant is Male. Please correct identity number.'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
 
@@ -173,7 +173,7 @@ class CaregiverChildConsentFormValidator(FormValidator):
         if (cleaned_data.get('gender') and cleaned_data.get('gender') == 'M'
                 and cleaned_data.get('child_preg_test') in [YES, NO]):
             msg = {'child_preg_test':
-                       'Can only be answered as Not applicable since child is Male'}
+                   'Can only be answered as Not applicable since child is Male'}
             self._errors.update(msg)
             raise ValidationError(msg)
 
@@ -212,13 +212,13 @@ class CaregiverChildConsentFormValidator(FormValidator):
                 if (child_age_at_2025 < 12
                         and cleaned_data.get('child_preg_test') != NOT_APPLICABLE):
                     msg = {'child_preg_test':
-                               'Child will not be 12 years old by 2025, This field is '
-                               'not applicable'}
+                           'Child will not be 12 years old by 2025, This field is '
+                           'not applicable'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
                 elif (child_age_at_2025 >= 12
                       and cleaned_data.get('child_preg_test') == NOT_APPLICABLE):
                     msg = {'child_preg_test':
-                               'Child is Female. This field is applicable'}
+                           'Child is Female. This field is applicable'}
                     self._errors.update(msg)
                     raise ValidationError(msg)

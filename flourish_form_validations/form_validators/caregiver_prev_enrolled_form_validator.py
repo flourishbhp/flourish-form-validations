@@ -39,13 +39,13 @@ class CaregiverPrevEnrolledFormValidator(FormValidator):
         if (self.cleaned_data.get('maternal_prev_enroll') == YES and
                 self.flourish_participation_interest('another_caregiver_interested')):
             message = {'maternal_prev_enroll':
-                           'Participant is not from any bhp prior studies'}
+                       'Participant is not from any bhp prior studies'}
             self._errors.update(message)
             raise ValidationError(message)
         elif (self.cleaned_data.get('maternal_prev_enroll') == NO and
               self.flourish_participation_interest('interested')):
             message = {'maternal_prev_enroll':
-                           'Participant is from a prior bhp study'}
+                       'Participant is from a prior bhp study'}
             self._errors.update(message)
             raise ValidationError(message)
 
@@ -86,7 +86,7 @@ class CaregiverPrevEnrolledFormValidator(FormValidator):
                         'report_datetime').date() - relativedelta(months=3)
                     if test_date < difference:
                         msg = {'test_date':
-                                   'HIV test date should not be older than 3 months'}
+                               'HIV test date should not be older than 3 months'}
                         self._errors.update(msg)
                         raise ValidationError(msg)
 
