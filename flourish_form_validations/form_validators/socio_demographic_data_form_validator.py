@@ -113,7 +113,7 @@ class SocioDemographicDataFormValidator(FormValidatorMixin, FormValidator):
         else:
             stay_with_child = self.cleaned_data.get('stay_with_child', None)
             if (stay_with_child and
-                getattr(child_sociodemographics, 'stay_with_caregiver', None) != stay_with_child):
+                    getattr(child_sociodemographics, 'stay_with_caregiver', None) != stay_with_child):
                 raise ValidationError(
                     {'stay_with_child':
                      'The response don\'t match with the '
