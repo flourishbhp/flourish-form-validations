@@ -258,21 +258,17 @@ class SubjectConsentFormValidator(ConsentsFormValidatorMixin,
     def validate_dob_unchanged(self, cleaned_data=None):
         current_dob = cleaned_data.get('dob')
         if current_dob:
-            try:
-                consent_objs = self.subject_consent_cls.objects.filter(
-                    screening_identifier=self.cleaned_data.get(
-                        'screening_identifier'))
-            except self.subject_consent_cls.DoesNotExist:
-                pass
-            else:
-                for consent_obj in consent_objs:
-                    if consent_obj.dob != current_dob:
-                        message = {'dob':
-                                'In previous consent the dob of the '
-                                f'participant was {consent_obj.dob}, but dob '
-                                f'now is {current_dob}.'}
-                        self._errors.update(message)
-                        raise ValidationError(message)
+            consent_objs = self.subject_consent_cls.objects.filter(
+                screening_identifier=self.cleaned_data.get('screening_identifier'))
+
+            for consent_obj in consent_objs:
+                if consent_obj.dob != current_dob:
+                    message = {'dob':
+                            'In previous consent the dob of the '
+                            f'participant was {consent_obj.dob}, but dob '
+                            f'now is {current_dob}.'}
+                    self._errors.update(message)
+                    raise ValidationError(message)
                     
 
     def validate_recruit_source(self):
