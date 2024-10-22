@@ -1,5 +1,6 @@
 import datetime
 import re
+import pytz
 
 from django.apps import apps as django_apps
 from django.core.exceptions import ValidationError
@@ -49,6 +50,7 @@ class CaregiverChildConsentFormValidator(FormValidator):
         self.validate_child_years_more_tha_12yrs_at_jun_2025(
             cleaned_data=self.cleaned_data)
         self.validate_identity_number(cleaned_data=self.cleaned_data)
+        self.validate_child_dob_match_del()
 
     def preg_not_required(self):
 
@@ -222,3 +224,25 @@ class CaregiverChildConsentFormValidator(FormValidator):
                            'Child is Female. This field is applicable'}
                     self._errors.update(msg)
                     raise ValidationError(msg)
+
+    def validate_child_dob_match_del(self):
+        """ For ANC participants validate that the delivery date matches
+            child DOB on the child consent form.
+        """
+        child_dob = self.cleaned_data.get('child_dob', None)
+        try:
+            delivery_obj = self.delivery_model_cls.objects.get(
+                child_subject_identifier=self.subject_identifier)
+        except self.delivery_model_cls.DoesNotExist:
+            pass
+        else:
+            delivery_dt = delivery_obj.delivery_datetime
+            local_tz = pytz.timezone('Africa/Gaborone')
+            local_delivery_dt = delivery_dt.astimezone(local_tz)
+
+            if child_dob != local_delivery_dt.date().strftime('%Y-%m-%d'):
+                msg = {'child_dob':
+                       'Infant DOB must match maternal delivery date. Expected'
+                       f' {local_delivery_dt.date()} got {child_dob}'}
+                self._errors.update(msg)
+                raise ValidationError(msg)
