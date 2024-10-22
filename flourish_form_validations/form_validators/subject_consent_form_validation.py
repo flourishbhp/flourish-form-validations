@@ -258,7 +258,6 @@ class SubjectConsentFormValidator(ConsentsFormValidatorMixin,
     def validate_dob_unchanged(self, cleaned_data=None):
         current_dob = cleaned_data.get('dob')
         if current_dob:
-            breakpoint()
             try:
                 consent_objs = self.subject_consent_cls.objects.filter(
                     screening_identifier=self.cleaned_data.get(
