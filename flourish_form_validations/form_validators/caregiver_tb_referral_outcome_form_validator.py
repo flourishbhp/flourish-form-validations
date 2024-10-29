@@ -7,11 +7,11 @@ from .crf_form_validator import FormValidatorMixin
 class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
-        firelds = ['clinic_name',
-                   'tests_performed',
-                   'diagnosed_with_tb']
+        fields = ['clinic_name',
+                  'tests_performed',
+                  'diagnosed_with_tb']
 
-        for field in firelds:
+        for field in fields:
             self.required_if(
                 YES,
                 field='tb_evaluation',
@@ -34,47 +34,21 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field_other='other_test_specify'
         )
 
-        self.m2m_required_if(
-            response='chest_xray',
-            field='chest_xray_results',
-            m2m_field='tests_performed'
-        )
+        qs = self.cleaned_data.get('tests_performed')
+        selected = {obj.short_name: obj.name for obj in qs}
 
-        self.m2m_required_if(
-            response='sputum_sample',
-            field='sputum_sample_results',
-            m2m_field='tests_performed'
-        )
+        response_mapping = {'chest_xray': 'chest_xray_results',
+                            'sputum_sample': 'sputum_sample_results',
+                            'stool_sample': 'sputum_sample_results',
+                            'urine_test': 'urine_test_results',
+                            'skin_test': 'skin_test_results',
+                            'blood_test': 'blood_test_results',
+                            OTHER: 'other_test_results'}
 
-        self.m2m_required_if(
-            response='stool_sample',
-            field='sputum_sample_results',
-            m2m_field='tests_performed'
-        )
-
-        self.m2m_required_if(
-            response='urine_test',
-            field='urine_test_results',
-            m2m_field='tests_performed'
-        )
-
-        self.m2m_required_if(
-            response='skin_test',
-            field='skin_test_results',
-            m2m_field='tests_performed'
-        )
-
-        self.m2m_required_if(
-            response='blood_test',
-            field='blood_test_results',
-            m2m_field='tests_performed'
-        )
-
-        self.m2m_required_if(
-            response=OTHER,
-            field='other_test_results',
-            m2m_field='tests_performed'
-        )
+        for response, field in response_mapping.items():
+            self.required_if_true(
+                response in selected,
+                field_required=field)
 
         tb_preventative_fields = [
             'tb_preventative_therapy',
