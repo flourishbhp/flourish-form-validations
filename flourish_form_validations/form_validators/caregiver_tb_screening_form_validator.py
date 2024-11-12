@@ -18,6 +18,10 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
         self.required_if(YES,
                          field='evaluated_for_tb',
+                         field_required='flourish_referral')
+
+        self.required_if(NO,
+                         field='flourish_referral',
                          field_required='clinic_visit_date')
 
         self.m2m_required_if(
