@@ -23,7 +23,20 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_evaluation',
             field_required='reasons',
         )
-
+        self.required_if(
+            YES,
+            field='tb_evaluation',
+            field_required='evaluated',
+        )
+        self.required_if(
+            NO,
+            field='evaluated',
+            field_required='reason_not_evaluated',
+        )
+        self.validate_other_specify(
+            field='reason_not_evaluated',
+            other_specify_field='reason_not_evaluated_other'
+        )
         self.validate_other_specify(
             field='clinic_name',
             other_specify_field='clinic_name_other'
