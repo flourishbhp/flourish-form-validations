@@ -73,6 +73,7 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
         field_responses = {
             'chest_xray': 'chest_xray_results',
             'sputum_sample': 'sputum_sample_results',
+            'stool_sample':'stool_sample_results',
             'urine_test': 'urine_test_results',
             'skin_test': 'skin_test_results',
             'blood_test': 'blood_test_results',
