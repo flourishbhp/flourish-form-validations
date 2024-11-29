@@ -66,6 +66,10 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_treatment',
             other_specify_field='other_tb_treatment'
         )
+        self.validate_other_specify(
+            field='reasons',
+            other_specify_field='other_reasons'
+        )
 
         self.validate_other_specify(
             field='tb_preventative_therapy',
