@@ -187,8 +187,13 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
 
         if feeding_mode == NOT_APPLICABLE and (still_births == 0):
             raise ValidationError(
-                {'feeding_mode': 'Feeding mode can only be "N/A" if still_births > 0.'}
+                {'feeding_mode': 'Feeding mode can only be "N/A" if still_births < 0.'}
             )
+        if feeding_mode != NOT_APPLICABLE and (still_births > 0):
+            raise ValidationError(
+                {'feeding_mode': 'Feeding mode cant be anything other than N/A, if still_births > 0.'}
+            )
+
 
 
 
