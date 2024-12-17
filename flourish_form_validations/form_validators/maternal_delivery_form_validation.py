@@ -50,6 +50,7 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
         self.validate_valid_regime_hiv_pos_only(cleaned_data=self.cleaned_data)
         self.validate_live_births_still_birth(cleaned_data=self.cleaned_data)
         self.validate_other()
+        self.validate_still_birth_na(cleaned_data=self.cleaned_data)
 
     def validate_ultrasound(self, cleaned_data=None):
         ultrasound = self.ultrasound_cls.objects.filter(
@@ -178,3 +179,17 @@ class MaternalDeliveryFormValidator(FormValidatorMixin,
                 raise ValidationError(
                     {'arv_initiation_date': 'Date not corresponding with the date from '
                      f'Arv Pregnancy CRF, the date should be {during_pregnancy.start_date} '})
+            
+
+    def validate_still_birth_na(self,cleaned_data=None):
+        still_births = cleaned_data.get('still_births')
+
+        self.applicable_if_true(
+                still_births == 0,
+                field_applicable='feeding_mode')
+
+
+
+
+
+
