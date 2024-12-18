@@ -7,15 +7,11 @@ from .crf_form_validator import FormValidatorMixin
 class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
-        firelds = ['clinic_name',
-                   'tests_performed',
-                   'diagnosed_with_tb']
 
-        for field in firelds:
-            self.required_if(
+        self.required_if(
                 YES,
                 field='tb_evaluation',
-                field_required=field
+                field_required='clinic_name'
             )
 
         self.required_if(
@@ -115,3 +111,13 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_isoniazid_preventative_therapy',
             other_specify_field='other_tb_isoniazid_preventative_therapy'
         )
+
+        required_fields =['tests_performed','diagnosed_with_tb','tb_treatment',
+                         'tb_preventative_therapy' ]
+        for field in required_fields:
+            self.required_if(
+                    YES,
+                    field='evaluated',
+                    field_required=field
+                )
+
