@@ -48,7 +48,7 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
 
         response_mapping = {'chest_xray': 'chest_xray_results',
                             'sputum_sample': 'sputum_sample_results',
-                            'stool_sample': 'sputum_sample_results',
+                            'stool_sample': 'stool_sample_results',
                             'urine_test': 'urine_test_results',
                             'skin_test': 'skin_test_results',
                             'blood_test': 'blood_test_results',
@@ -58,22 +58,20 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             self.required_if_true(
                 response in selected,
                 field_required=field)
-
-        tb_preventative_fields = [
-            'tb_preventative_therapy',
-            'tb_isoniazid_preventative_therapy',
-        ]
-
-        for field in tb_preventative_fields:
-            self.required_if(
-                YES,
-                field='tb_treatment',
-                field_required=field
+    
+        self.required_if(
+            YES,
+            field='tb_treatment',
+            field_required='tb_preventative_therapy'
             )
 
         self.validate_other_specify(
             field='tb_treatment',
             other_specify_field='other_tb_treatment'
+        )
+        self.validate_other_specify(
+            field='reasons',
+            other_specify_field='other_reasons'
         )
 
         self.validate_other_specify(
