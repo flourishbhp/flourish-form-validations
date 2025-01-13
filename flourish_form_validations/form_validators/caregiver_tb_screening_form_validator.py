@@ -1,6 +1,6 @@
-from edc_constants.constants import NO, NONE, OTHER, YES
+from edc_constants.constants import NO, NONE, OTHER, YES,POS,NEG
 from edc_form_validators import FormValidator
-
+from django.core.exceptions import ValidationError
 from .crf_form_validator import FormValidatorMixin
 
 
@@ -85,3 +85,32 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
                 m2m_field='tb_tests',
                 field_other=field,
             )
+
+        self.validate_results_tb_treatment_and_prevention()
+
+    def validate_results_tb_treatment_and_prevention(self):
+        started_on_TB_treatment = self.cleaned_data.get('started_on_TB_treatment')
+        started_on_TB_preventative_therapy = self.cleaned_data.get('started_on_TB_preventative_therapy')
+        test_results = [
+            self.cleaned_data.get('chest_xray_results'),
+            self.cleaned_data.get('sputum_sample_results'),
+            self.cleaned_data.get('urine_test_results'),
+            self.cleaned_data.get('skin_test_results'),
+            self.cleaned_data.get('blood_test_results'),
+        ]
+
+        any_positive = POS in test_results
+        all_negative = all(result == NEG for result in test_results)
+
+
+        if any_positive:
+            if started_on_TB_treatment != YES and started_on_TB_preventative_therapy != YES:
+                raise ValidationError({
+                    'started_on_TB_treatment': 'If any test result is positive, this field must be Yes',
+                    'started_on_TB_preventative_therapy': 'If any test result is positive, this field must be Yes.',
+                })
+        if all_negative:
+            if started_on_TB_treatment != NO :
+                raise ValidationError({
+                    'started_on_TB_treatment': 'If all test results are negative, this field must not be Yes or Other.',
+                    })
