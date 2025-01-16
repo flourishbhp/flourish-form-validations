@@ -9,6 +9,10 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
     def clean(self):
         super().clean()
 
+        self.diagnoses_required_validation()
+        self.validate_results_tb_treatment_and_prevention()
+        self.not_flourish_referral_validation()
+
         required_fields = ['cough', 'fever', 'sweats', 'weight_loss']
 
         for field in required_fields:
@@ -36,12 +40,6 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
             field_other='other_test',
         )
 
-        self.m2m_other_specify(
-            NONE,
-            m2m_field='tb_tests',
-            field_other='diagnosed_with_TB',
-        )
-
         self.validate_other_specify(
             field='diagnosed_with_TB',
         )
@@ -61,6 +59,12 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
             field_required='started_on_TB_preventative_therapy',
             field='diagnosed_with_TB',
         )
+
+        self.field_cannot_be(field_1='diagnosed_with_TB',
+                             field_2='started_on_TB_preventative_therapy',
+                             field_one_condition=YES,
+                             field_two_condition=YES)
+        
 
         self.validate_other_specify(
             field='started_on_TB_preventative_therapy'
@@ -86,17 +90,29 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
                 field_other=field,
             )
 
-        self.validate_results_tb_treatment_and_prevention()
+    def field_cannot_be(self, field_1, field_2, field_one_condition,
+                        field_two_condition):
+        """Raises an exception based on the condition between field_1 and field_2
+        values."""
+        cleaned_data = self.cleaned_data
+        field_1_value = cleaned_data.get(field_1)
+        field_2_value = cleaned_data.get(field_2)
+
+        if field_1_value == field_one_condition and field_2_value == field_two_condition:
+            message = {field_2: (f'cannot be {field_two_condition} when '
+                                 f'is {field_two_condition}.')}
+            raise ValidationError(message, code='message')
+        return False
 
     def validate_results_tb_treatment_and_prevention(self):
         started_on_TB_treatment = self.cleaned_data.get('started_on_TB_treatment')
-        started_on_TB_preventative_therapy = self.cleaned_data.get('started_on_TB_preventative_therapy')
         test_results = [
             self.cleaned_data.get('chest_xray_results'),
             self.cleaned_data.get('sputum_sample_results'),
             self.cleaned_data.get('urine_test_results'),
             self.cleaned_data.get('skin_test_results'),
             self.cleaned_data.get('blood_test_results'),
+            self.cleaned_data.get('stool_sample_results'),
         ]
 
         any_positive = POS in test_results
@@ -104,13 +120,42 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
 
         if any_positive:
-            if started_on_TB_treatment != YES and started_on_TB_preventative_therapy != YES:
+            if started_on_TB_treatment != YES:
                 raise ValidationError({
                     'started_on_TB_treatment': 'If any test result is positive, this field must be Yes',
-                    'started_on_TB_preventative_therapy': 'If any test result is positive, this field must be Yes.',
                 })
         if all_negative:
             if started_on_TB_treatment != NO :
                 raise ValidationError({
                     'started_on_TB_treatment': 'If all test results are negative, this field must not be Yes or Other.',
                     })
+
+    def diagnoses_required_validation(self):
+
+        tb_tests_responses = [obj.short_name for obj in self.cleaned_data.get('tb_tests', [])]
+
+        # Check if there are any responses that are not NONE
+        if any(response != NONE for response in tb_tests_responses):
+            if not self.cleaned_data.get('diagnosed_with_TB'):
+                message={
+                    'diagnosed_with_TB',
+                    'This field is required when a TB test other than NONE is selected.'
+                }
+
+                raise ValidationError(message)
+            
+
+
+    def not_flourish_referral_validation(self):
+        evaluated_for_tb = self.cleaned_data.get('evaluated_for_tb')
+
+        if evaluated_for_tb == YES:
+
+            referral_fields = ['clinic_visit_date','tb_tests','diagnosed_with_TB','started_on_TB_treatment'
+                           ]
+        
+            for referral_field in referral_fields:
+
+                    self.required_if(NO,
+                                    field='flourish_referral',
+                                    field_required=referral_field)
