@@ -103,29 +103,12 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
     def validate_results_tb_treatment_and_prevention(self):
         started_on_TB_treatment = self.cleaned_data.get('started_on_TB_treatment')
-        test_results = [
-            self.cleaned_data.get('chest_xray_results'),
-            self.cleaned_data.get('sputum_sample_results'),
-            self.cleaned_data.get('urine_test_results'),
-            self.cleaned_data.get('skin_test_results'),
-            self.cleaned_data.get('blood_test_results'),
-            self.cleaned_data.get('stool_sample_results'),
-        ]
+        diagnosed_with_TB = self.cleaned_data.get('diagnosed_with_TB')
 
-        any_positive = POS in test_results
-        all_negative = all(result == NEG for result in test_results)
-
-
-        if any_positive:
-            if started_on_TB_treatment != YES:
+        if started_on_TB_treatment != YES and diagnosed_with_TB == YES:
                 raise ValidationError({
-                    'started_on_TB_treatment': 'If any test result is positive, this field must be Yes',
+                    'started_on_TB_treatment': 'If diagnosed with tb, this field must be Yes',
                 })
-        if all_negative:
-            if started_on_TB_treatment != NO :
-                raise ValidationError({
-                    'started_on_TB_treatment': 'If all test results are negative, this field must not be Yes or Other.',
-                    })
 
     def diagnoses_required_validation(self):
 
@@ -136,7 +119,7 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
 
 
     def not_flourish_referral_validation(self):
-        referral_fields = ['clinic_visit_date','tb_tests','diagnosed_with_TB','started_on_TB_treatment']
+        referral_fields = ['clinic_visit_date','tb_tests','diagnosed_with_TB',]
         
         for referral_field in referral_fields:
 
