@@ -92,6 +92,7 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
         self.required_if(YES,
                          field='diagnosed_with_tb',
                          field_required='tb_treatment')
+        self.validate_results_tb_treatment_and_prevention()
         
     def validate_results_tb_treatment_and_prevention(self):
         tb_treatment = self.cleaned_data.get('tb_treatment')
