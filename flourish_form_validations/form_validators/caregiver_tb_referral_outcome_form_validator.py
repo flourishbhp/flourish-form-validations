@@ -1,6 +1,6 @@
 from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator
-from django.forms import ValidationError
+
 from .crf_form_validator import FormValidatorMixin
 
 
@@ -23,33 +23,11 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_evaluation',
             field_required='reasons',
         )
-        required_fields =['tests_performed','diagnosed_with_tb' ]
-        for field in required_fields:
-            self.required_if(
-                    YES,
-                    field='evaluated',
-                    field_required=field
-                )
-        self.required_if(
-            YES,
-            field='tb_evaluation',
-            field_required='evaluated',
-        )
-        self.required_if(
-            NO,
-            field='evaluated',
-            field_required='reason_not_evaluated',
-        )
-        self.validate_other_specify(
-            field='reason_not_evaluated',
-            other_specify_field='reason_not_evaluated_other'
-        )
+
         self.validate_other_specify(
             field='clinic_name',
             other_specify_field='clinic_name_other'
         )
-
-        self.m2m_single_selection_if('none', m2m_field='tests_performed')
 
         self.m2m_other_specify(
             m2m_field='tests_performed',
@@ -73,8 +51,8 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
                 field_required=field)
     
         self.required_if(
-            NO,
-            field='diagnosed_with_tb',
+            YES,
+            field='tb_treatment',
             field_required='tb_preventative_therapy'
             )
 
@@ -91,24 +69,4 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_preventative_therapy',
             other_specify_field='other_tb_preventative_therapy'
         )
-
-        self.validate_other_specify(
-            field='tb_isoniazid_preventative_therapy',
-            other_specify_field='other_tb_isoniazid_preventative_therapy'
-        )
-
-        self.required_if(YES,
-                         field='diagnosed_with_tb',
-                         field_required='tb_treatment')
-        
-    def validate_results_tb_treatment_and_prevention(self):
-        tb_treatment = self.cleaned_data.get('tb_treatment')
-        diagnosed_with_tb = self.cleaned_data.get('diagnosed_with_tb')
-    
-        if tb_treatment != YES and diagnosed_with_tb == YES:
-                raise ValidationError({
-                    'tb_treatment': 'If any diagnosed with tb , this field must be Yes',
-                })
-
-        
 
