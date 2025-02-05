@@ -1,21 +1,17 @@
 from edc_constants.constants import NO, OTHER, YES
 from edc_form_validators import FormValidator
-
+from django.forms import ValidationError
 from .crf_form_validator import FormValidatorMixin
 
 
 class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator):
 
     def clean(self):
-        fields = ['clinic_name',
-                  'tests_performed',
-                  'diagnosed_with_tb']
 
-        for field in fields:
-            self.required_if(
+        self.required_if(
                 YES,
                 field='tb_evaluation',
-                field_required=field
+                field_required='clinic_name'
             )
 
         self.required_if(
@@ -23,11 +19,33 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_evaluation',
             field_required='reasons',
         )
-
+        required_fields = ['tests_performed', 'diagnosed_with_tb', ]
+        for field in required_fields:
+            self.required_if(
+                    YES,
+                    field='evaluated',
+                    field_required=field
+                )
+        self.required_if(
+            YES,
+            field='tb_evaluation',
+            field_required='evaluated',
+        )
+        self.required_if(
+            NO,
+            field='evaluated',
+            field_required='reason_not_evaluated',
+        )
+        self.validate_other_specify(
+            field='reason_not_evaluated',
+            other_specify_field='reason_not_evaluated_other'
+        )
         self.validate_other_specify(
             field='clinic_name',
             other_specify_field='clinic_name_other'
         )
+
+        self.m2m_single_selection_if('none', m2m_field='tests_performed')
 
         self.m2m_other_specify(
             m2m_field='tests_performed',
@@ -39,7 +57,7 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
 
         response_mapping = {'chest_xray': 'chest_xray_results',
                             'sputum_sample': 'sputum_sample_results',
-                            'stool_sample': 'sputum_sample_results',
+                            'stool_sample': 'stool_sample_results',
                             'urine_test': 'urine_test_results',
                             'skin_test': 'skin_test_results',
                             'blood_test': 'blood_test_results',
@@ -50,21 +68,19 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
                 response in selected,
                 field_required=field)
 
-        tb_preventative_fields = [
-            'tb_preventative_therapy',
-            'tb_isoniazid_preventative_therapy',
-        ]
-
-        for field in tb_preventative_fields:
-            self.required_if(
-                YES,
-                field='tb_treatment',
-                field_required=field
-            )
+        self.required_if(
+            NO,
+            field='diagnosed_with_tb',
+            field_required='tb_preventative_therapy'
+        )
 
         self.validate_other_specify(
             field='tb_treatment',
             other_specify_field='other_tb_treatment'
+        )
+        self.validate_other_specify(
+            field='reasons',
+            other_specify_field='other_reasons'
         )
 
         self.validate_other_specify(
@@ -76,3 +92,18 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             field='tb_isoniazid_preventative_therapy',
             other_specify_field='other_tb_isoniazid_preventative_therapy'
         )
+
+        self.required_if(YES,
+                         field='diagnosed_with_tb',
+                         field_required='tb_treatment')
+
+        self.validate_results_tb_treatment_and_prevention()
+
+    def validate_results_tb_treatment_and_prevention(self):
+        tb_treatment = self.cleaned_data.get('tb_treatment')
+        diagnosed_with_tb = self.cleaned_data.get('diagnosed_with_tb')
+
+        if tb_treatment != YES and diagnosed_with_tb == YES:
+                raise ValidationError({
+                    'tb_treatment':
+                    'If any diagnosed with tb , this field must be Yes', })
