@@ -1,4 +1,4 @@
-from edc_constants.constants import NO, OTHER, YES
+from edc_constants.constants import NO, OTHER, YES, DWTA
 from edc_form_validators import FormValidator
 
 from .crf_form_validator import FormValidatorMixin
@@ -74,3 +74,8 @@ class HITSPostReferralFormValidator(FormValidatorMixin, FormValidator):
                 YES,
                 field='visited_referral_site',
                 field_required=field)
+
+        self.not_required_if(
+            DWTA,
+            field='visited_referral_site',
+            field_required='additional_counseling')

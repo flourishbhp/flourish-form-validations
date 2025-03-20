@@ -10,7 +10,6 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
         super().clean()
 
         self.validate_results_tb_treatment_and_prevention()
-        
 
         required_fields = ['cough', 'fever', 'sweats', 'weight_loss']
 
@@ -23,7 +22,6 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
                          field='evaluated_for_tb',
                          field_required='flourish_referral')
         self.not_flourish_referral_validation()
-
 
         self.m2m_single_selection_if(
             'None', m2m_field='tb_tests'
@@ -61,7 +59,6 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
                              field_2='started_on_TB_preventative_therapy',
                              field_one_condition=YES,
                              field_two_condition=YES)
-        
 
         self.validate_other_specify(
             field='started_on_TB_preventative_therapy'
@@ -74,7 +71,7 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
         field_responses = {
             'chest_xray': 'chest_xray_results',
             'sputum_sample': 'sputum_sample_results',
-            'stool_sample':'stool_sample_results',
+            'stool_sample': 'stool_sample_results',
             'urine_test': 'urine_test_results',
             'skin_test': 'skin_test_results',
             'blood_test': 'blood_test_results',
@@ -116,12 +113,11 @@ class CaregiverTBScreeningFormValidator(FormValidatorMixin, FormValidator):
         self.required_if_true(any(response != 'None' for response in tb_tests_responses),
                               field_required='diagnosed_with_TB')
 
-
-
     def not_flourish_referral_validation(self):
-        referral_fields = ['clinic_visit_date','tb_tests','diagnosed_with_TB',]
-        
+        referral_fields = ['clinic_visit_date', 'tb_tests', 'diagnosed_with_TB', ]
+
         for referral_field in referral_fields:
 
-            self.required_if(NO,field='flourish_referral',
-                                field_required=referral_field)
+            self.required_if(NO,
+                             field='flourish_referral',
+                             field_required=referral_field)
