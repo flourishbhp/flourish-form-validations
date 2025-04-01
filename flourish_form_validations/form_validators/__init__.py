@@ -30,6 +30,7 @@ from .covid19_form_validation import Covid19FormValidator
 from .crf_form_validator import FormValidatorMixin
 from .food_security_questionnaire_form_validator import \
     FoodSecurityQuestionnaireFormValidator
+from .hits_post_referral_form_validator import HITSPostReferralFormValidator
 from .hits_screening_form_validator import HITSScreeningFormValidator
 from .hiv_disclosure_status_form_validator import \
     HIVDisclosureStatusFormValidator

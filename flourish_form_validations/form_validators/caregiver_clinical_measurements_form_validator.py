@@ -23,8 +23,8 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
         if (cleaned_data.get('systolic_bp') and cleaned_data.get('diastolic_bp')):
             if cleaned_data.get('systolic_bp') < cleaned_data.get('diastolic_bp'):
                 msg = {'diastolic_bp':
-                           'Systolic blood pressure cannot be lower than the'
-                           'diastolic blood pressure. Please correct.'}
+                       'Systolic blood pressure cannot be lower than the'
+                       'diastolic blood pressure. Please correct.'}
                 self._errors.update(msg)
                 raise ValidationError(msg)
 
@@ -96,19 +96,19 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
             if (self.check_weight_bp_cm
                     and obtained_all_cm == YES and confirm_values == NO):
                 message = {'confirm_values':
-                               'Are you sure about the given values please confirm!'}
+                           'Are you sure about the given values please confirm!'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == YES and not self.check_weight_bp_cm:
                 message = {'all_measurements':
-                               'Please provide all measurements'}
+                           'Please provide all measurements'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == NO and self.check_weight_bp_cm:
                 message = {'all_measurements':
-                               'All measurements have been given please select Yes.'}
+                           'All measurements have been given please select Yes.'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
@@ -122,19 +122,19 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
             if (self.check_all_cm_1000
                     and obtained_all_cm == YES and confirm_values != YES):
                 message = {'confirm_values':
-                               'Are you sure about the given values please confirm!'}
+                           'Are you sure about the given values please confirm!'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == NO and self.check_all_cm_1000:
                 message = {'all_measurements':
-                               'All measurements have been given please select Yes'}
+                           'All measurements have been given please select Yes'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == YES and not self.check_all_cm_1000:
                 message = {'all_measurements':
-                               'Please provide all measurements'}
+                           'Please provide all measurements'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
@@ -147,19 +147,19 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
 
             if self.check_all_cm and obtained_all_cm == YES and confirm_values != YES:
                 message = {'confirm_values':
-                               'Are you sure about the given values please confirm!'}
+                           'Are you sure about the given values please confirm!'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == NO and self.check_all_cm:
                 message = {'all_measurements':
-                               'All measurements have been given please select Yes'}
+                           'All measurements have been given please select Yes'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == YES and not self.check_all_cm:
                 message = {'all_measurements':
-                               'Please provide all measurements'}
+                           'Please provide all measurements'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
@@ -168,24 +168,24 @@ class CaregiverClinicalMeasurementsFormValidator(FormValidatorMixin,
         confirm_values = self.cleaned_data.get('confirm_values')
         visit_code = self.cleaned_data.get('maternal_visit').visit_code
 
-        if visit_code in  ['3000M','3000A','3000B','3000C']:
+        if visit_code in ['3000M', '3000A', '3000B', '3000C']:
 
             if (self.check_all_cm_3000
                     and obtained_all_cm == YES and confirm_values != YES):
                 message = {'confirm_values':
-                               'Are you sure about the given values please confirm!'}
+                           'Are you sure about the given values please confirm!'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == NO and self.check_all_cm_3000:
                 message = {'all_measurements':
-                               'All measurements have been given please select Yes'}
+                           'All measurements have been given please select Yes'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
             elif obtained_all_cm == YES and not self.check_all_cm_3000:
                 message = {'all_measurements':
-                               'Please provide all measurements'}
+                           'Please provide all measurements'}
                 self._errors.update(message)
                 raise ValidationError(message)
 
