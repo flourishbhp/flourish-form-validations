@@ -142,9 +142,13 @@ class CaregiverTBReferralOutcomeFormValidator(FormValidatorMixin, FormValidator)
             referral_outcome = self.tb_referral_outcome_model_cls.objects.filter(
                 maternal_visit__subject_identifier=self.subject_identifier,
                 report_datetime__range=(referral_dt, get_utcnow()))
-            if self.instance:
-                referral_outcome = referral_outcome.exclude(id=self.instance.id)
-            if referral_outcome.exists():
+
+            maternal_visit = self.cleaned_data.get('maternal_visit', None)
+
+            instance_exists = self.tb_referral_outcome_model_cls.objects.filter(
+                maternal_visit=maternal_visit).exists()
+
+            if not instance_exists and referral_outcome.exists():
                 visit_code = referral_outcome.first().visit_code
                 raise ValidationError(
                     {'__all__':
