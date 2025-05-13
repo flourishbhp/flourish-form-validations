@@ -23,6 +23,8 @@ class MedicalHistoryFormValidator(FormValidatorMixin, FormValidator):
             'maternal_visit').subject_identifier
         super().clean()
 
+        subject_status = self.maternal_status_helper.hiv_status
+
         self.m2m_other_specify(OTHER, m2m_field='current_symptoms',
                                field_other='current_symptoms_other')
 
@@ -44,20 +46,18 @@ class MedicalHistoryFormValidator(FormValidatorMixin, FormValidator):
 
         self.validate_caregiver_chronic_multiple_selection(
             cleaned_data=self.cleaned_data)
-        self.validate_who_diagnosis_neg(
-            cleaned_data=self.cleaned_data)
+        self.validate_who_diagnosis_neg(subject_status)
         self.validate_who_diagnosis_who_chronic_list(
-            cleaned_data=self.cleaned_data)
+            cleaned_data=self.cleaned_data, subject_status=subject_status)
         self.validate_other_caregiver()
         self.validate_caregiver_medications_multiple_selections()
         self.validate_other_caregiver_medications()
+
         self.applicable_if_true(
-            self.subject_status == POS,
+            subject_status == POS,
             field_applicable='know_hiv_status', )
 
-    def validate_who_diagnosis_neg(self, cleaned_data=None):
-        subject_status = self.maternal_status_helper.hiv_status
-
+    def validate_who_diagnosis_neg(self, subject_status=''):
         self.applicable_if_true(
             subject_status == POS,
             field_applicable='who_diagnosis',
@@ -67,9 +67,8 @@ class MedicalHistoryFormValidator(FormValidatorMixin, FormValidator):
                                 'is Not Applicable')
         )
 
-    def validate_who_diagnosis_who_chronic_list(self, cleaned_data=None):
-        subject_status = self.maternal_status_helper.hiv_status
-
+    def validate_who_diagnosis_who_chronic_list(
+            self, cleaned_data=None, subject_status=''):
         if subject_status == POS and cleaned_data.get('who_diagnosis') == YES:
             qs = self.cleaned_data.get('who')
             if qs and qs.count() > 0:
